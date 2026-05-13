@@ -1,0 +1,191 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-image: url('../estilo/background_cancha.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 100vh;
+}
+
+.main-header {
+    background-color: #1D3D81;
+    width: 100%;
+    padding: 12px 0;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-back:hover {
+    background: white;
+    color: #1D3D81;
+}
+
+.central-container {
+    padding-top: 100px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-title {
+    color: white;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    margin-bottom: 30px;
+}
+
+.glass-table-container {
+    background: rgba(29, 61, 129, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 25px;
+    width: 95%; 
+    max-width: 1200px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    overflow-x: auto;
+    margin: 0 auto; 
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    text-align: left;
+}
+
+.user-table thead tr {
+    background-color: rgba(29, 61, 129, 0.6); 
+    border-bottom: 2px solid white;
+}
+
+.user-table th, .user-table td {
+    padding: 15px 20px;
+}
+
+.user-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.3s;
+}
+
+.user-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.action-cell {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-table, .btn-activar, .btn-inactivar {
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.btn-table.edit {
+    background: rgba(77, 184, 255, 0.15);
+    color: #4db8ff;
+    border-color: rgba(77, 184, 255, 0.4);
+}
+.btn-table.edit:hover {
+    background: #4db8ff;
+    color: white;
+    box-shadow: 0 0 10px rgba(77, 184, 255, 0.5);
+}
+
+.btn-inactivar {
+    background: rgba(255, 77, 77, 0.1);
+    color: #ff4d4d;
+    border-color: rgba(255, 77, 77, 0.4);
+}
+.btn-inactivar:hover {
+    background: #ff4d4d;
+    color: white;
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+}
+
+.btn-activar {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-color: rgba(40, 167, 69, 0.4);
+}
+.btn-activar:hover {
+    background: #28a745;
+    color: white;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+.badge-estado {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.estado-activo { background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 1px solid #4caf50; }
+.estado-inactivo { background: rgba(244, 67, 54, 0.2); color: #f44336; border: 1px solid #f44336; }
+
+.user-table thead tr {
+    background-color: rgba(255, 255, 255, 0.1); 
+    border-bottom: 2px solid white;
+}
+
+.user-table th {
+    color: #FFFF; 
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.swal2-popup {
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 15px !important;
+}
+
+.swal2-title {
+    font-size: 1.2rem !important;
+    text-transform: uppercase !important;
+}
+
+.swal2-html-container {
+    font-size: 0.95rem !important;
+}

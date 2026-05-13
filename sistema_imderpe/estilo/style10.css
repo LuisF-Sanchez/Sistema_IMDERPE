@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-image: url('../estilo/background_cancha.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.main-header {
+    background-color: #1D3D81;
+    padding: 12px 0;
+    position: fixed;
+    top: 0; width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+}
+
+.btn-back {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 15px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.btn-back:hover {
+    background: white;
+    color: #1D3D81;
+}
+
+.central-container {
+    padding: 100px 20px 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.glass-form-container {
+    background: rgba(29, 61, 129, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.form-header { text-align: center; margin-bottom: 30px; }
+.form-header h2 { margin-top: 10px; text-transform: uppercase; color: #FBC02D; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.input-group { display: flex; flex-direction: column; gap: 8px; }
+.input-group label { font-size: 0.9rem; font-weight: 600; color: #FBC02D; }
+
+.full-width { grid-column: span 2; }
+
+input, select {
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 1rem;
+}
+
+input:focus { border-color: #FBC02D; outline: none; }
+
+.btn-submit {
+    margin-top: 30px;
+    width: 100%;
+    padding: 15px;
+    background: #FBC02D;
+    border: none;
+    border-radius: 8px;
+    color: #1D3D81;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-submit:hover { background: #fbc02dcc; transform: translateY(-2px); }
+
+select option {
+    background-color: #1D3D81;
+    color: #ffffff; 
+}

@@ -1,0 +1,109 @@
+:root {
+    --azul-imderpe: #1D3D81;
+    --rojo-imderpe: #D32F2F;
+    --verde-imderpe: #2E7D32;
+    --gris-claro: #f4f4f4;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('background.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.2); 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+    
+    padding: 40px;
+    border-radius: 15px; 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 5px solid var(--azul-imderpe); 
+}
+
+.logo {
+    background-image: url('logo.png');
+    width: 100%;
+    height: 140px; 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 auto 20px auto; 
+    display: block;
+}
+
+h2 {
+    color: #1D3D81; 
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: #1D3D81; 
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9); 
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--azul-imderpe);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(29, 61, 129, 0.4);
+}
+
+.btn-login:hover {
+    background-color: #152d5e;
+    transform: translateY(-2px);
+}
+
+footer {
+    margin-top: 30px;
+    font-size: 0.75rem;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 15px;
+}

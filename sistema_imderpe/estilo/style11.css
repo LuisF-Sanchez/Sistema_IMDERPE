@@ -1,0 +1,200 @@
+/* style11.css - Gestión Integral IMDERPE */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-image: url('../estilo/background_cancha.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* --- Barra Superior --- */
+.main-header {
+    background-color: #1D3D81;
+    width: 100%;
+    padding: 12px 0;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-back:hover {
+    background: white;
+    color: #1D3D81;
+}
+
+/* --- Contenedor Principal --- */
+.central-container {
+    padding-top: 110px; 
+    padding-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-title {
+    color: white;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.glass-table-container {
+    background: rgba(29, 61, 129, 0.85); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    padding: 30px;
+    width: 95%; 
+    max-width: 1450px; 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    overflow-x: auto;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    font-size: 0.95rem;
+}
+
+.user-table thead tr {
+    border-bottom: 2px solid #FBC02D;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.user-table th {
+    padding: 18px 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: left;
+}
+
+.user-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    vertical-align: middle;
+}
+
+.user-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.action-cell {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    min-width: 220px;
+}
+
+.btn-table, .btn-activar, .btn-inactivar {
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+}
+
+.btn-table.edit {
+    background: rgba(77, 184, 255, 0.1);
+    color: #4db8ff;
+    border-color: rgba(77, 184, 255, 0.4);
+}
+.btn-table.edit:hover {
+    background: #4db8ff;
+    color: white;
+    box-shadow: 0 0 12px rgba(77, 184, 255, 0.4);
+}
+
+.btn-inactivar {
+    background: rgba(255, 77, 77, 0.1);
+    color: #ff4d4d;
+    border-color: rgba(255, 77, 77, 0.4);
+}
+.btn-inactivar:hover {
+    background: #ff4d4d;
+    color: white;
+    box-shadow: 0 0 12px rgba(255, 77, 77, 0.4);
+}
+
+.btn-activar {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-color: rgba(40, 167, 69, 0.4);
+}
+.btn-activar:hover {
+    background: #28a745;
+    color: white;
+    box-shadow: 0 0 12px rgba(40, 167, 69, 0.4);
+}
+
+.badge-estado {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+}
+
+.estado-activo { 
+    background: rgba(40, 167, 69, 0.2); 
+    color: #2ecc71; 
+    border: 1px solid #2ecc71; 
+}
+
+.estado-inactivo { 
+    background: rgba(231, 76, 60, 0.2); 
+    color: #e74c3c; 
+    border: 1px solid #e74c3c; 
+}
+
+.badge-disciplina {
+    background: rgba(251, 192, 45, 0.15); 
+    color: #FBC02D;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(251, 192, 45, 0.4);
+}
+
+.empty-state {
+    padding: 60px 0;
+    opacity: 0.7;
+}
