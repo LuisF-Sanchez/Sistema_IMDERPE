@@ -29,6 +29,7 @@ if (!isset($_SESSION['usuario_nombre'])) {
                 </button>
                 <div class="dropdown-content">
                     <a href="../vista/ver_empleados.php"><i class="fas fa-clipboard-list"></i> Empleados</a>
+                    <a href="../vista/registrar_actividades.php"><i class="fas fa-calendar-alt"></i> Actividades</a>
                     <a href="../vista/ver_atletas.php"><i class="fas fa-medal"></i> Atletas</a>
                     <a href="../vista/ver_representantes.php"><i class="fas fa-users"></i> Rep. de Atletas</a>
                     <a href="../vista/ver_entrenadores.php"><i class="fa-solid fa-whistle"></i> Entrenadores</a>
