@@ -1,4 +1,3 @@
-/* style_reportes.css - Dashboard de Estadísticas IMDERPE */
 body {
     margin: 0;
     padding: 0;
@@ -171,7 +170,7 @@ tr:hover {
     color: white;
     text-decoration: underline;
 }
-/* Nuevos componentes para la barra de herramientas de fechas */
+
 .header-filters-layout {
     display: flex;
     justify-content: space-between;

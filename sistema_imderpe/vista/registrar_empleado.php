@@ -31,6 +31,17 @@
             </div>
 
             <div class="input-group">
+                <i class="fas fa-briefcase"></i>
+                <select name="cargo" required>
+                    <option value="" disabled selected>Seleccione Cargo</option>
+                    <option value="Por asignar">Por asignar</option>
+                    <option value="Administrativo">Administrativo</option>
+                    <option value="Instructor">Instructor</option>
+                    <option value="Coordinador">Coordinador</option>
+                </select>
+            </div>
+
+            <div class="input-group">
                 <i class="fas fa-phone"></i>
                 <input type="text" name="telefono" placeholder="Número de Teléfono" required>
             </div>

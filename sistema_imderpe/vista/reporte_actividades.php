@@ -6,23 +6,18 @@ if (!isset($_SESSION['usuario_nombre'])) {
 }
 require_once '../controlador/conexion.php';
 
-// Capturamos el período o las fechas personalizadas
 $periodo = isset($_GET['periodo']) ? $_GET['periodo'] : 'mensual';
 $fecha_desde = isset($_GET['fecha_desde']) ? $_GET['fecha_desde'] : '';
 $fecha_hasta = isset($_GET['fecha_hasta']) ? $_GET['fecha_hasta'] : '';
 
-// Variable para armar los parámetros que se le enviarán al PDF
 $url_params = "";
 
-// Construcción de la lógica de filtrado SQL
 if (!empty($fecha_desde) && !empty($fecha_hasta)) {
-    // Si el usuario usó el filtro personalizado de fechas
     $filtro_sql = "WHERE a.fecha BETWEEN '$fecha_desde' AND '$fecha_hasta'";
     $titulo_grafica = "Periodo del " . date('d/m/Y', strtotime($fecha_desde)) . " al " . date('d/m/Y', strtotime($fecha_hasta));
-    $periodo = 'personalizado'; // Cambiamos el estado para desactivar los botones rápidos
+    $periodo = 'personalizado'; 
     $url_params = "periodo=personalizado&fecha_desde=$fecha_desde&fecha_hasta=$fecha_hasta";
 } else {
-    // Si usó los botones rápidos tradicionales
     switch ($periodo) {
         case 'trimestral':
             $filtro_sql = "WHERE a.fecha >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
@@ -34,15 +29,22 @@ if (!empty($fecha_desde) && !empty($fecha_hasta)) {
             break;
         case 'mensual':
         default:
-            $filtro_sql = "WHERE a.fecha >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
-            $titulo_grafica = "Últimos 30 Días";
+            $filtro_sql = "WHERE MONTH(a.fecha) = MONTH(CURDATE()) AND YEAR(a.fecha) = YEAR(CURDATE())";
+            
+            $meses = [
+                1 => "Enero", 2 => "Febrero", 3 => "Marzo", 4 => "Abril", 
+                5 => "Mayo", 6 => "Junio", 7 => "Julio", 8 => "Agosto", 
+                9 => "Septiembre", 10 => "Octubre", 11 => "Noviembre", 12 => "Diciembre"
+            ];
+            $mes_actual = $meses[(int)date('m')];
+            $titulo_grafica = "Mes de " . $mes_actual . " " . date('Y');
+            
             $periodo = 'mensual';
             break;
     }
     $url_params = "periodo=$periodo";
 }
 
-// 1. CONSULTA PARA LA GRÁFICA (Agrupado por tipo de actividad)
 $query_grafica = "SELECT t.nombre_tipo, COUNT(a.id) as total 
                   FROM actividades a
                   INNER JOIN tipos_actividad t ON a.tipo_id = t.id 
@@ -52,12 +54,14 @@ $res_grafica = $conexion->query($query_grafica);
 
 $labels = [];
 $valores = [];
+$total_general_actividades = 0; 
+
 while ($row = $res_grafica->fetch_assoc()) {
     $labels[] = $row['nombre_tipo'];
     $valores[] = $row['total'];
+    $total_general_actividades += $row['total']; 
 }
 
-// 2. CONSULTA PARA LA TABLA DE DETALLES
 $query_tabla = "SELECT a.nombre_actividad, a.fecha, a.lugar, t.nombre_tipo, e.nombre, e.apellido 
                 FROM actividades a
                 INNER JOIN tipos_actividad t ON a.tipo_id = t.id
@@ -110,8 +114,18 @@ $res_tabla = $conexion->query($query_tabla);
             <div class="header-report">
                 <h2><i class="fas fa-chart-bar"></i> Estadísticas: <?php echo $titulo_grafica; ?></h2>
             </div>
-            <div class="chart-wrapper">
+            <div class="chart-wrapper" style="position: relative; margin-bottom: 10px;">
                 <canvas id="chartActividades"></canvas>
+            </div>
+            
+            <div class="total-unificado-container" style="display: flex; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 5px;">
+                <div style="background: rgba(29, 61, 129, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 25px; border-radius: 30px; color: white; font-weight: bold; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-calculator" style="color: #FBC02D;"></i>
+                    <span>Total General Unificado:</span>
+                    <span style="background: #FBC02D; color: #1D3D81; padding: 2px 12px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; min-width: 30px; text-align: center;">
+                        <?php echo $total_general_actividades; ?>
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -197,7 +211,7 @@ $res_tabla = $conexion->query($query_tabla);
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { color: '#ffffff', stepSize: 1 }, // Escala de 1 en 1 para contar actividades exactas
+                        ticks: { color: '#ffffff', stepSize: 1 }, 
                         grid: { color: 'rgba(255, 255, 255, 0.1)' }
                     },
                     x: {

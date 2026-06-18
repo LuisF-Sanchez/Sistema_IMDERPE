@@ -1,11 +1,15 @@
 <?php
 require_once 'conexion.php';
 
+$disciplina_filtro = isset($_GET['disciplina']) ? $_GET['disciplina'] : '';
+$genero_filtro = isset($_GET['genero']) ? $_GET['genero'] : '';
+
 $sql = "SELECT 
             a.id, 
             a.cedula, 
             a.nombre, 
             a.apellido, 
+            a.genero,
             a.fecha_nacimiento,
             a.estado,
             r.nombre AS nombre_rep, 
@@ -16,11 +20,36 @@ $sql = "SELECT
         FROM atletas a
         INNER JOIN representantes r ON a.representante_id = r.id
         INNER JOIN entrenadores e ON a.entrenador_id = e.id
-        INNER JOIN disciplinas d ON a.disciplina_id = d.id";
+        INNER JOIN disciplinas d ON a.disciplina_id = d.id WHERE 1=1";
 
-$resultado = $conexion->query($sql);
+$params = [];
+$types = "";
+
+if (!empty($disciplina_filtro)) {
+    $sql .= " AND a.disciplina_id = ?";
+    $params[] = $disciplina_filtro;
+    $types .= "i";
+}
+
+if (!empty($genero_filtro)) {
+    $sql .= " AND a.genero = ?";
+    $params[] = $genero_filtro;
+    $types .= "s";
+}
+
+$stmt = $conexion->prepare($sql);
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$resultado = $stmt->get_result();
 
 if (!$resultado) {
     die("Error en la consulta: " . $conexion->error);
 }
+
+$sql_disc = "SELECT id, nombre_disciplina FROM disciplinas";
+$resultado_disciplinas = $conexion->query($sql_disc);
 ?>

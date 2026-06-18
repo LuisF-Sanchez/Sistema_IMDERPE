@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-05-2026 a las 05:16:19
+-- Tiempo de generación: 18-06-2026 a las 14:37:29
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -42,7 +42,10 @@ CREATE TABLE `actividades` (
 
 INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`, `empleado_id`) VALUES
 (1, 'Rally deportivo', '2026-05-22', 'Plaza Bolivar', 2, 6),
-(2, 'Rally deportivo', '2026-05-23', 'Plaza Bolivar', 2, 6);
+(2, 'Rally deportivo', '2026-05-23', 'Plaza Bolivar', 2, 6),
+(3, 'mantenimiento a la cancha', '2026-05-30', 'limoncito', 4, 5),
+(4, 'carrera de bici ', '2026-05-31', 'avenida ', 2, 6),
+(5, 'Construcción de nueva cancha', '2026-06-13', 'Villanueva', 5, 1);
 
 -- --------------------------------------------------------
 
@@ -51,6 +54,7 @@ INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`
 --
 
 CREATE TABLE `administrador` (
+  `id` int(11) NOT NULL,
   `nombre` varchar(40) NOT NULL,
   `cedula` int(8) NOT NULL,
   `telefono` varchar(20) NOT NULL,
@@ -63,9 +67,8 @@ CREATE TABLE `administrador` (
 -- Volcado de datos para la tabla `administrador`
 --
 
-INSERT INTO `administrador` (`nombre`, `cedula`, `telefono`, `correo`, `contraseña`, `tipo`) VALUES
-('pedro', 3102912, '042441287', 'pedroloz@gmail.com', '12345', 'administrador'),
-('luis', 31185743, '04269907063', 'admin123@gmail.com', '12345', 'administrador');
+INSERT INTO `administrador` (`id`, `nombre`, `cedula`, `telefono`, `correo`, `contraseña`, `tipo`) VALUES
+(2, 'luis', 31185743, '04269907063', 'admin123@gmail.com', '12345', 'administrador');
 
 -- --------------------------------------------------------
 
@@ -91,10 +94,10 @@ CREATE TABLE `atletas` (
 --
 
 INSERT INTO `atletas` (`id`, `cedula`, `nombre`, `apellido`, `fecha_nacimiento`, `genero`, `estado`, `representante_id`, `entrenador_id`, `disciplina_id`) VALUES
-(1, '30123456', 'pedro', 'Reina', '2006-08-08', '', 'activo', 1, 1, 1),
-(2, '99998888', 'pochita', 'cascada', '2026-05-08', '', 'activo', 2, 1, 2),
-(3, '3423432523', 'dfsaasfasdf', 'adfdafadsfsa', '2026-05-09', '', 'activo', 1, 1, 3),
-(4, '123456', 'juan', 'perez', '2026-03-10', '', 'activo', 4, 1, 1);
+(1, '30123456', 'pedro', 'Reina', '2006-08-08', 'masculino', 'activo', 1, 1, 1),
+(2, '99998888', 'pochita', 'cascada', '2026-05-08', 'femenino', 'activo', 2, 1, 2),
+(3, '3423432523', 'dfsaasfasdf', 'adfdafadsfsa', '2026-05-09', 'femenino', 'activo', 1, 1, 3),
+(4, '123456', 'juan', 'perez', '2026-03-10', 'masculino', 'activo', 4, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -127,6 +130,7 @@ CREATE TABLE `empleados` (
   `cedula` varchar(8) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
+  `cargo` enum('Por asignar','Administrativo','Instructor','Coordinador') NOT NULL DEFAULT 'Por asignar',
   `telefono` varchar(20) NOT NULL,
   `correo` varchar(100) NOT NULL,
   `estado` enum('activo','inactivo') NOT NULL
@@ -136,12 +140,12 @@ CREATE TABLE `empleados` (
 -- Volcado de datos para la tabla `empleados`
 --
 
-INSERT INTO `empleados` (`id`, `cedula`, `nombre`, `apellido`, `telefono`, `correo`, `estado`) VALUES
-(1, '10320890', 'maria', 'magdalena', '02513341567', 'magda300@gmail.com', 'activo'),
-(2, '19203489', 'Roberto', 'Placenta', '04261993043', 'Robertp@gmail.com', 'activo'),
-(3, '4818921', 'prueba', 'test', '124144565', 'qwirfihuas@gmail.com', 'activo'),
-(5, '21781408', 'ciruela', 'pollito', '532414123', 'papas@gmail.com', 'activo'),
-(6, '2353', 'chinchulin', 'dfwewq', '13123214', 'asdasdqg@gmail.com', 'activo');
+INSERT INTO `empleados` (`id`, `cedula`, `nombre`, `apellido`, `cargo`, `telefono`, `correo`, `estado`) VALUES
+(1, '10320890', 'maria', 'lopez', 'Administrativo', '02513341567', 'magda300@gmail.com', 'activo'),
+(2, '19203489', 'Roberto', 'Placenta', 'Por asignar', '04261993043', 'Robertp@gmail.com', 'activo'),
+(3, '4818921', 'prueba', 'test', 'Por asignar', '124144565', 'qwirfihuas@gmail.com', 'activo'),
+(5, '21781408', 'ciruela', 'pollito', 'Por asignar', '532414123', 'papas@gmail.com', 'activo'),
+(6, '2353', 'chinchulin', 'dfwewq', 'Por asignar', '13123214', 'asdasdqg@gmail.com', 'activo');
 
 -- --------------------------------------------------------
 
@@ -202,9 +206,10 @@ CREATE TABLE `representantes` (
 
 INSERT INTO `representantes` (`id`, `cedula`, `nombre`, `apellido`, `telefono`, `correo`, `direccion`) VALUES
 (1, '10833678', 'carlitos', 'londres', '04261993043', '', 'sabanita'),
-(2, '898989898', 'alvarado', 'monserat', '04122128830', '', 'casa club'),
+(2, '898989898', 'alvarado', 'monserat', '04122128830', 'alvaradox9@gmail.com', 'casa club'),
 (3, '423414', 'dsgsdgsg', 'dfhdfghds', '322523423', '', 'sfdagsagsdf'),
-(4, '323231', 'dsgsdgsfff', 'fdafdfafd', '22421324', '', 'accacacaca');
+(4, '323231', 'dsgsdgsfff', 'fdafdfafd', '22421324', '', 'accacacaca'),
+(5, '10182109', 'Yoswar', 'Mendez', '04264414253', '', 'Sabanita');
 
 -- --------------------------------------------------------
 
@@ -235,6 +240,7 @@ INSERT INTO `tipos_actividad` (`id`, `nombre_tipo`) VALUES
 --
 
 CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL,
   `nombre` varchar(40) NOT NULL,
   `cedula` int(8) NOT NULL,
   `telefono` varchar(20) NOT NULL,
@@ -247,8 +253,8 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`nombre`, `cedula`, `telefono`, `correo`, `contraseña`, `tipo`) VALUES
-('Macarena Reina', 14693646, '04264561888', 'macarena@gmail.com', '1567882', 'usuario');
+INSERT INTO `usuarios` (`id`, `nombre`, `cedula`, `telefono`, `correo`, `contraseña`, `tipo`) VALUES
+(1, 'Macarena Reina', 14693646, '04264561888', 'macarena@gmail.com', '1567882', 'usuario');
 
 --
 -- Índices para tablas volcadas
@@ -265,7 +271,7 @@ ALTER TABLE `actividades`
 -- Indices de la tabla `administrador`
 --
 ALTER TABLE `administrador`
-  ADD PRIMARY KEY (`cedula`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `atletas`
@@ -324,7 +330,11 @@ ALTER TABLE `tipos_actividad`
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`cedula`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `cedula` (`cedula`),
+  ADD UNIQUE KEY `cedula_2` (`cedula`),
+  ADD UNIQUE KEY `cedula_3` (`cedula`),
+  ADD KEY `cedula_4` (`cedula`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -334,6 +344,12 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `actividades`
 --
 ALTER TABLE `actividades`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `administrador`
+--
+ALTER TABLE `administrador`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
@@ -370,13 +386,19 @@ ALTER TABLE `entrenador_disciplina`
 -- AUTO_INCREMENT de la tabla `representantes`
 --
 ALTER TABLE `representantes`
-  MODIFY `id` int(150) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(150) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `tipos_actividad`
 --
 ALTER TABLE `tipos_actividad`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Restricciones para tablas volcadas
@@ -399,6 +421,7 @@ ALTER TABLE `atletas`
 -- Filtros para la tabla `entrenadores`
 --
 ALTER TABLE `entrenadores`
+  ADD CONSTRAINT `entrenadores_ibfk_1` FOREIGN KEY (`id`) REFERENCES `atletas` (`representante_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_entrenador_disciplina` FOREIGN KEY (`disciplina_id`) REFERENCES `disciplinas` (`id`) ON UPDATE CASCADE;
 
 --

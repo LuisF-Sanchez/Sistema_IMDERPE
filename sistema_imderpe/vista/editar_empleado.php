@@ -52,6 +52,16 @@ if (isset($_GET['id'])) {
             </div>
 
             <div class="input-group">
+                <i class="fas fa-briefcase"></i>
+                <select name="cargo" required>
+                    <option value="Por asignar" <?php echo ($empleado['cargo'] == 'Por asignar') ? 'selected' : ''; ?>>Por asignar</option>
+                    <option value="Administrativo" <?php echo ($empleado['cargo'] == 'Administrativo') ? 'selected' : ''; ?>>Administrativo</option>
+                    <option value="Instructor" <?php echo ($empleado['cargo'] == 'Instructor') ? 'selected' : ''; ?>>Instructor</option>
+                    <option value="Coordinador" <?php echo ($empleado['cargo'] == 'Coordinador') ? 'selected' : ''; ?>>Coordinador</option>
+                </select>
+            </div>
+
+            <div class="input-group">
                 <i class="fas fa-phone"></i>
                 <input type="text" name="telefono" value="<?php echo htmlspecialchars($empleado['telefono']); ?>" placeholder="Número de Teléfono" required>
             </div>

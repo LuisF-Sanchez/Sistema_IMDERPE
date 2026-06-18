@@ -26,6 +26,37 @@ require_once '../controlador/controlador_atletas.php';
     <main class="central-container">
         <h1 class="main-title">Panel de Atletas</h1>
         
+        <form method="GET" action="" class="filter-form" style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap;">
+            <div class="input-group" style="position: relative; margin-bottom: 0; min-width: 200px;">
+                <i class="fas fa-dumbbell" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.8); z-index: 1;"></i>
+                <select name="disciplina" onchange="this.form.submit()" style="width: 100%; padding: 12px 12px 12px 45px; background: #1D3D81; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; color: white; outline: none; box-sizing: border-box; font-size: 0.95rem; cursor: pointer;">
+                    <option value="" style="background: #1D3D81; color: white;">Todas las Disciplinas</option>
+                    <?php if ($resultado_disciplinas && $resultado_disciplinas->num_rows > 0): ?>
+                        <?php while($disc = $resultado_disciplinas->fetch_assoc()): ?>
+                            <option value="<?php echo $disc['id']; ?>" <?php echo ($disciplina_filtro == $disc['id']) ? 'selected' : ''; ?> style="background: #1D3D81; color: white;">
+                                <?php echo htmlspecialchars($disc['nombre_disciplina']); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+
+            <div class="input-group" style="position: relative; margin-bottom: 0; min-width: 200px;">
+                <i class="fas fa-venus-mars" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.8); z-index: 1;"></i>
+                <select name="genero" onchange="this.form.submit()" style="width: 100%; padding: 12px 12px 12px 45px; background: #1D3D81; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; color: white; outline: none; box-sizing: border-box; font-size: 0.95rem; cursor: pointer;">
+                    <option value="" style="background: #1D3D81; color: white;">Todos los Géneros</option>
+                    <option value="Masculino" <?php echo ($genero_filtro == 'Masculino') ? 'selected' : ''; ?> style="background: #1D3D81; color: white;">Masculino</option>
+                    <option value="Femenino" <?php echo ($genero_filtro == 'Femenino') ? 'selected' : ''; ?> style="background: #1D3D81; color: white;">Femenino</option>
+                </select>
+            </div>
+
+            <?php if (!empty($disciplina_filtro) || !empty($genero_filtro)): ?>
+                <a href="ver_atletas.php" style="padding: 12px 20px; background: #dc3545; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; text-transform: uppercase; box-sizing: border-box;">
+                    <i class="fas fa-times-circle" style="margin-right: 8px;"></i> Limpiar
+                </a>
+            <?php endif; ?>
+        </form>
+
         <div class="glass-table-container">
             <?php if ($resultado && $resultado->num_rows > 0): ?>
                 <table class="user-table">
@@ -34,6 +65,7 @@ require_once '../controlador/controlador_atletas.php';
                             <th>ID</th>
                             <th>Cédula</th>
                             <th>Atleta</th>
+                            <th>Género</th>
                             <th>Nacimiento</th>
                             <th>Representante</th>
                             <th>Entrenador</th>
@@ -48,6 +80,7 @@ require_once '../controlador/controlador_atletas.php';
                                 <td><?php echo $row['id']; ?></td>
                                 <td><?php echo htmlspecialchars($row['cedula']); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre'] . " " . $row['apellido']); ?></td>
+                                <td><?php echo htmlspecialchars($row['genero']); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($row['fecha_nacimiento'])); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre_rep'] . " " . $row['apellido_rep']); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre_ent'] . " " . $row['apellido_ent']); ?></td>
@@ -78,7 +111,7 @@ require_once '../controlador/controlador_atletas.php';
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fas fa-running fa-3x"></i>
-                    <p>No hay atletas registrados actualmente.</p>
+                    <p>No se encontraron atletas con los filtros aplicados.</p>
                 </div>
             <?php endif; ?>
         </div>

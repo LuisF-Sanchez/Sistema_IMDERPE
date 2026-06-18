@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+if (!isset($_SESSION['usuario_nombre'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
 include "../controlador/tabla_usuarios.php";
 ?>
 <!DOCTYPE html>
@@ -17,7 +23,6 @@ include "../controlador/tabla_usuarios.php";
             <a href="../vista/inicio.php" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Volver al Inicio
             </a>
-            
             <a href="../vista/registrar.php" class="btn-back">
                 <i class="fas fa-user-plus"></i> Registrar Usuario
             </a>
@@ -37,7 +42,8 @@ include "../controlador/tabla_usuarios.php";
                             <th>Teléfono</th>
                             <th>Correo</th>
                             <th>Tipo</th>
-                            <th style="text-align: center;">Acciones</th> </tr>
+                            <th style="text-align: center;">Acciones</th>
+                        </tr>
                     </thead>
                     <tbody>
                         <?php while($row = $resultado->fetch_assoc()): ?>
@@ -48,20 +54,17 @@ include "../controlador/tabla_usuarios.php";
                                 <td><?php echo htmlspecialchars($row['correo']); ?></td>
                                 <td>
                                     <?php if ($row['tipo'] == 'administrador'): ?>
-                                        <span class="badge badge-admin">
-                                            <i class="fas fa-crown"></i> Admin
-                                        </span>
+                                        <span class="badge badge-admin"><i class="fas fa-crown"></i> Admin</span>
                                     <?php else: ?>
-                                        <span class="badge badge-user">
-                                            <i class="fas fa-user"></i> Usuario
-                                        </span>
+                                        <span class="badge badge-user"><i class="fas fa-user"></i> Usuario</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="action-cell">
-                                    <a href="#" class="btn-table edit">
+                                    <a href="editar_usuario.php?id=<?php echo $row['id']; ?>&tipo=<?php echo $row['tipo']; ?>" class="btn-table edit">
                                         <i class="fas fa-edit"></i> Editar
                                     </a>
-                                    <a href="#" class="btn-table delete">
+                                    
+                                    <a href="javascript:void(0);" onclick="advertenciaEliminar(<?php echo $row['id']; ?>, '<?php echo $row['tipo']; ?>')" class="btn-table delete">
                                         <i class="fas fa-trash-alt"></i> Eliminar
                                     </a>
                                 </td>
@@ -78,18 +81,40 @@ include "../controlador/tabla_usuarios.php";
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
 
-    <?php if (isset($_GET['success']) && $_GET['success'] == 'true'): ?>
-        <?php 
-            $tipoMsg = ($_GET['tipo'] == 'administrador') ? 'Administrador registrado' : 'Usuario registrado';
-        ?>
-        <script>
+        function limpiarURL() {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+
+        function advertenciaEliminar(id, tipo) {
             Swal.fire({
-                title: '¡Éxito!',
-                text: '<?php echo $tipoMsg; ?> correctamente.',
+                title: '¿Estás seguro?',
+                text: "Esta acción eliminará permanentemente al " + tipo + " del sistema.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ff4d4d',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                background: '#1D3D81',
+                color: '#ffffff',
+                iconColor: '#FBC02D'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    window.location.href = "../controlador/controlador_eliminar_usuario.php?id=" + id + "&tipo=" + tipo;
+                }
+            });
+        }
+
+        <?php if (isset($_GET['eliminar_exito'])): ?>
+            Swal.fire({
+                title: '¡Eliminado!',
+                text: 'El registro ha sido removido correctamente del sistema.',
                 icon: 'success',
-                timer: 3500,
-                timerProgressBar: true,
+                timer: 3000,
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -97,12 +122,24 @@ include "../controlador/tabla_usuarios.php";
                 color: '#ffffff',
                 iconColor: '#28a745'
             });
-            window.history.replaceState({}, document.title, window.location.pathname);
-        </script>
-    <?php endif; ?>
+            limpiarURL();
+        <?php endif; ?>
 
+        <?php if (isset($_GET['error_eliminar'])): ?>
+            Swal.fire({
+                title: '¡Error!',
+                text: 'Sucedió un error interno en el servidor al intentar eliminar.',
+                icon: 'error',
+                timer: 3500,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                background: '#1D3D81',
+                color: '#ffffff',
+                iconColor: '#ff4d4d'
+            });
+            limpiarURL();
+        <?php endif; ?>
+    </script>
 </body>
 </html>
-<?php 
-$conexion->close(); 
-?>

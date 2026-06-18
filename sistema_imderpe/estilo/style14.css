@@ -1,4 +1,3 @@
-/* style14.css - Módulo de Actividades IMDERPE */
 body {
     margin: 0;
     padding: 0;
@@ -121,17 +120,11 @@ body {
     text-decoration: underline;
 }
 
-/* ==========================================================================
-   AJUSTES EXCLUSIVOS PARA EL MINI-FORMULARIO COMPACTO (TIPO DE ACTIVIDAD)
-   ========================================================================== */
-
-/* Asegura que el contenedor del calendario muestre el icono nativo en blanco */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
 }
 
-/* Caja contenedora para la zona del formulario secundario */
 .extra-action-container {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
@@ -140,7 +133,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-/* Botón interactivo para abrir/cerrar el tipo secundario */
 .btn-secondary {
     width: 100%;
     padding: 10px;
@@ -161,14 +153,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
 }
 
-/* Contenedor del colapsable */
 .mini-form-collapse {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Botón para guardar la sub-actividad */
 .btn-save-mini {
     width: 100%;
     padding: 10px;

@@ -6,12 +6,8 @@ if (!isset($_SESSION['usuario_nombre'])) {
 }
 require_once '../controlador/conexion.php';
 
-// Consultamos los empleados activos para el select de Responsable
-$res_empleados = $conexion->query("SELECT id, nombre, apellido FROM empleados WHERE estado = 'activo' ORDER BY nombre ASC");
+$res_empleados = $conexion->query("SELECT id, nombre, apellido, cargo FROM empleados WHERE estado = 'activo' ORDER BY nombre ASC");
 
-// Consultamos los tipos de actividades existentes para el select
-// Nota: Es recomendable tener una tabla 'tipos_actividad' para que sea dinámico, o usar los ENUM del sistema.
-// Para permitir registrar nuevos tipos en caliente, asumiremos que tienes una tabla 'tipos_actividad' (id, nombre_tipo).
 $res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER BY nombre_tipo ASC");
 ?>
 
@@ -86,11 +82,11 @@ $res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER
 
                 <div class="input-group">
                     <i class="fas fa-user-shield"></i>
-                    <select name="empleado_id" required>
-                        <option value="" disabled selected>Seleccione Responsable</option>
+                    <select name="empleado_id" id="empleado_id" required disabled>
+                        <option value="" disabled selected>Primero seleccione una actividad...</option>
                         <?php while($e = $res_empleados->fetch_assoc()): ?>
                             <option value="<?php echo $e['id']; ?>">
-                                <?php echo htmlspecialchars($e['nombre'] . " " . $e['apellido']); ?>
+                                <?php echo htmlspecialchars($e['nombre'] . " " . $e['apellido'] . " - " . $e['cargo']); ?>
                             </option>
                         <?php endwhile; ?>
                     </select>
@@ -113,6 +109,31 @@ $res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER
                 miniForm.style.display = 'none';
                 this.innerHTML = '<i class="fas fa-plus-circle"></i> Nuevo Tipo de Actividad';
                 this.style.background = '#17a2b8';
+            }
+        });
+
+        const tipoActividadSelect = document.getElementById('tipo_id');
+        const empleadoSelect = document.getElementById('empleado_id');
+
+        if (tipoActividadSelect.value !== "") {
+            empleadoSelect.disabled = false;
+            if (empleadoSelect.querySelector('option[value=""]')) {
+                empleadoSelect.querySelector('option[value=""]').textContent = "Seleccione Responsable";
+            }
+        }
+
+        tipoActividadSelect.addEventListener('change', function() {
+            if (this.value !== "") {
+                empleadoSelect.disabled = false;
+                if (empleadoSelect.querySelector('option[value=""]')) {
+                    empleadoSelect.querySelector('option[value=""]').textContent = "Seleccione Responsable";
+                }
+            } else {
+                empleadoSelect.disabled = true;
+                empleadoSelect.value = "";
+                if (empleadoSelect.querySelector('option[value=""]')) {
+                    empleadoSelect.querySelector('option[value=""]').textContent = "Primero seleccione una actividad...";
+                }
             }
         });
     </script>

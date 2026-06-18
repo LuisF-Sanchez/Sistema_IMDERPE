@@ -57,6 +57,14 @@ if (!isset($atleta)) {
                     </div>
 
                     <div class="input-group">
+                        <label for="genero">Género</label>
+                        <select name="genero" id="genero" required>
+                            <option value="Masculino" <?php echo ($atleta['genero'] == 'Masculino') ? 'selected' : ''; ?>>Masculino</option>
+                            <option value="Femenino" <?php echo ($atleta['genero'] == 'Femenino') ? 'selected' : ''; ?>>Femenino</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
                         <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                         <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" value="<?php echo $atleta['fecha_nacimiento']; ?>" required>
                     </div>
