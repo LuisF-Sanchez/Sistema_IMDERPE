@@ -114,6 +114,9 @@ $res_tabla = $conexion->query($query_tabla);
             <div class="header-report">
                 <h2><i class="fas fa-chart-bar"></i> Estadísticas: <?php echo $titulo_grafica; ?></h2>
             </div>
+            
+            <div id="statusFiltro" style="text-align: center; color: #FBC02D; font-weight: bold; font-size: 0.95rem; min-height: 20px; margin-bottom: 5px;"></div>
+
             <div class="chart-wrapper" style="position: relative; margin-bottom: 10px;">
                 <canvas id="chartActividades"></canvas>
             </div>
@@ -138,7 +141,7 @@ $res_tabla = $conexion->query($query_tabla);
             </div>
 
             <div class="table-responsive">
-                <table>
+                <table id="tablaAuditoria">
                     <thead>
                         <tr>
                             <th>Actividad</th>
@@ -183,21 +186,25 @@ $res_tabla = $conexion->query($query_tabla);
         const finalLabels = labelsTipos.length > 0 ? labelsTipos : ['Sin datos en el rango'];
         const finalData = datosTotales.length > 0 ? datosTotales : [0];
 
-        new Chart(ctx, {
+        const listaColores = [
+            'rgba(251, 192, 45, 0.7)',
+            'rgba(40, 167, 69, 0.7)',
+            'rgba(23, 162, 184, 0.7)',
+            'rgba(0, 123, 255, 0.7)',
+            'rgba(153, 102, 255, 0.7)'
+        ];
+        const listaBordes = ['#FBC02D', '#28a745', '#17a2b8', '#007bff', '#9966ff'];
+        let indiceFiltrado = null;
+
+        const miGrafica = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: finalLabels,
                 datasets: [{
                     label: 'Suma de Actividades',
                     data: finalData,
-                    backgroundColor: [
-                        'rgba(251, 192, 45, 0.7)',
-                        'rgba(40, 167, 69, 0.7)',
-                        'rgba(23, 162, 184, 0.7)',
-                        'rgba(0, 123, 255, 0.7)',
-                        'rgba(153, 102, 255, 0.7)'
-                    ],
-                    borderColor: ['#FBC02D', '#28a745', '#17a2b8', '#007bff', '#9966ff'],
+                    backgroundColor: [...listaColores],
+                    borderColor: [...listaBordes],
                     borderWidth: 1.5,
                     borderRadius: 5
                 }]
@@ -207,6 +214,26 @@ $res_tabla = $conexion->query($query_tabla);
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false }
+                },
+                onHover: (event, elements) => {
+                    if (indiceFiltrado !== null) return;
+
+                    if (elements.length > 0) {
+                        const idx = elements[0].index;
+                        const nuevosColores = finalData.map((_, i) => 
+                            i === idx ? listaColores[i].replace('0.7', '0.95') : listaColores[i].replace('0.7', '0.15')
+                        );
+                        const nuevosBordes = finalData.map((_, i) => 
+                            i === idx ? listaBordes[i] : 'rgba(255, 255, 255, 0.05)'
+                        );
+                        
+                        miGrafica.data.datasets[0].backgroundColor = nuevosColores;
+                        miGrafica.data.datasets[0].borderColor = nuevosBordes;
+                    } else {
+                        miGrafica.data.datasets[0].backgroundColor = [...listaColores];
+                        miGrafica.data.datasets[0].borderColor = [...listaBordes];
+                    }
+                    miGrafica.update('none');
                 },
                 scales: {
                     y: {
@@ -218,9 +245,59 @@ $res_tabla = $conexion->query($query_tabla);
                         ticks: { color: '#ffffff' },
                         grid: { display: false }
                     }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+
+                        if (indiceFiltrado === index) {
+                            revertirFiltroExterno();
+                        } else {
+                            const tipoSeleccionado = finalLabels[index];
+                            miGrafica.data.labels = [tipoSeleccionado];
+                            miGrafica.data.datasets[0].data = [finalData[index]];
+                            miGrafica.data.datasets[0].backgroundColor = [listaColores[index]];
+                            miGrafica.data.datasets[0].borderColor = [listaBordes[index]];
+                            indiceFiltrado = index;
+                            
+                            document.getElementById('statusFiltro').innerHTML = 
+                                `<i class="fas fa-filter"></i> Enfocado en: ${tipoSeleccionado} &nbsp;|&nbsp; <span style="cursor:pointer; text-decoration: underline;" onclick="revertirFiltroExterno()">Mostrar todos</span>`;
+                            
+                            filtrarTablaHTML(tipoSeleccionado);
+                            miGrafica.update();
+                        }
+                    }
                 }
             }
         });
+
+        function filtrarTablaHTML(tipo) {
+            const filas = document.querySelectorAll('#tablaAuditoria tbody tr');
+            filas.forEach(fila => {
+                const badge = fila.querySelector('.badge-tipo');
+                if (badge) {
+                    if (badge.textContent.trim() === tipo) {
+                        fila.style.display = '';
+                    } else {
+                        fila.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        function revertirFiltroExterno() {
+            miGrafica.data.labels = finalLabels;
+            miGrafica.data.datasets[0].data = finalData;
+            miGrafica.data.datasets[0].backgroundColor = [...listaColores];
+            miGrafica.data.datasets[0].borderColor = [...listaBordes];
+            indiceFiltrado = null;
+            document.getElementById('statusFiltro').innerText = "";
+            
+            const filas = document.querySelectorAll('#tablaAuditoria tbody tr');
+            filas.forEach(fila => fila.style.display = '');
+            
+            miGrafica.update();
+        }
     </script>
 </body>
 </html>
