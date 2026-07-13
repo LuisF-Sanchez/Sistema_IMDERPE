@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-06-2026 a las 14:37:29
+-- Tiempo de generación: 13-07-2026 a las 17:02:13
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -33,19 +33,22 @@ CREATE TABLE `actividades` (
   `fecha` date NOT NULL,
   `lugar` varchar(255) NOT NULL,
   `tipo_id` int(11) NOT NULL,
-  `empleado_id` int(11) NOT NULL
+  `empleado_id` int(11) NOT NULL,
+  `resena` text DEFAULT NULL,
+  `foto_actividad` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `actividades`
 --
 
-INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`, `empleado_id`) VALUES
-(1, 'Rally deportivo', '2026-05-22', 'Plaza Bolivar', 2, 6),
-(2, 'Rally deportivo', '2026-05-23', 'Plaza Bolivar', 2, 6),
-(3, 'mantenimiento a la cancha', '2026-05-30', 'limoncito', 4, 5),
-(4, 'carrera de bici ', '2026-05-31', 'avenida ', 2, 6),
-(5, 'Construcción de nueva cancha', '2026-06-13', 'Villanueva', 5, 1);
+INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`, `empleado_id`, `resena`, `foto_actividad`) VALUES
+(1, 'Rally deportivo', '2026-05-22', 'Plaza Bolivar', 2, 6, NULL, NULL),
+(2, 'Rally deportivo', '2026-05-23', 'Plaza Bolivar', 2, 6, NULL, NULL),
+(3, 'mantenimiento a la cancha', '2026-05-30', 'limoncito', 4, 5, NULL, NULL),
+(4, 'carrera de bici ', '2026-05-31', 'avenida ', 2, 6, NULL, NULL),
+(5, 'Construcción de nueva cancha', '2026-06-13', 'Villanueva', 5, 1, NULL, NULL),
+(6, 'actividad ejemplar', '2026-07-12', 'lugar ejemplar', 1, 2, 'Este texto es ejemplar para probar el detalle histórico', 'actividad_1783913321.jpg');
 
 -- --------------------------------------------------------
 
@@ -130,22 +133,26 @@ CREATE TABLE `empleados` (
   `cedula` varchar(8) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
-  `cargo` enum('Por asignar','Administrativo','Instructor','Coordinador') NOT NULL DEFAULT 'Por asignar',
+  `foto` varchar(255) NOT NULL DEFAULT 'defaultavatar.png',
+  `cargo` enum('Por asignar','Presidente','Administrador','Jefe de Planificación','Jefe de la Oficina de la OAC','Promotor Deportivo','Médica','Supervisor Deportivo','Asistente Administrativo','Secretaria','Entrenador Deportivo','Analista de RRHH','Obrero Fijo','Obrero Contratado') NOT NULL DEFAULT 'Por asignar',
   `telefono` varchar(20) NOT NULL,
   `correo` varchar(100) NOT NULL,
-  `estado` enum('activo','inactivo') NOT NULL
+  `estado` enum('activo','inactivo') NOT NULL,
+  `fecha_ingreso` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `empleados`
 --
 
-INSERT INTO `empleados` (`id`, `cedula`, `nombre`, `apellido`, `cargo`, `telefono`, `correo`, `estado`) VALUES
-(1, '10320890', 'maria', 'lopez', 'Administrativo', '02513341567', 'magda300@gmail.com', 'activo'),
-(2, '19203489', 'Roberto', 'Placenta', 'Por asignar', '04261993043', 'Robertp@gmail.com', 'activo'),
-(3, '4818921', 'prueba', 'test', 'Por asignar', '124144565', 'qwirfihuas@gmail.com', 'activo'),
-(5, '21781408', 'ciruela', 'pollito', 'Por asignar', '532414123', 'papas@gmail.com', 'activo'),
-(6, '2353', 'chinchulin', 'dfwewq', 'Por asignar', '13123214', 'asdasdqg@gmail.com', 'activo');
+INSERT INTO `empleados` (`id`, `cedula`, `nombre`, `apellido`, `foto`, `cargo`, `telefono`, `correo`, `estado`, `fecha_ingreso`) VALUES
+(1, '1032089', 'maria', 'lopez', 'defaultavatar.png', 'Secretaria', '02513341567', 'magda300@gmail.com', 'activo', NULL),
+(2, '19203489', 'Roberto', 'Placenta', 'empleado_19203489_1783621530.jfif', 'Promotor Deportivo', '04261993043', 'Robertp@gmail.com', 'activo', NULL),
+(3, '4818921', 'prueba', 'test', 'defaultavatar.png', 'Por asignar', '124144565', 'qwirfihuas@gmail.com', 'activo', NULL),
+(5, '21781408', 'ciruela', 'pollito', 'defaultavatar.png', 'Por asignar', '532414123', 'papas@gmail.com', 'activo', NULL),
+(6, '2353', 'chinchulin', 'dfwewq', 'defaultavatar.png', 'Por asignar', '13123214', 'asdasdqg@gmail.com', 'activo', NULL),
+(7, '17612823', 'Joan', 'Escalona', 'empleado_17.612.823_1783620820.jfif', 'Presidente', '04269987345', 'joanpro@gmail.com', 'activo', '2025-08-01'),
+(8, '21130372', 'keily', 'mendez', 'empleado_21130372_1783620990.jfif', 'Analista de RRHH', '0414175933', 'keily@gmail.com', 'activo', '2024-07-09');
 
 -- --------------------------------------------------------
 
@@ -170,7 +177,7 @@ CREATE TABLE `entrenadores` (
 
 INSERT INTO `entrenadores` (`id`, `cedula`, `nombre`, `apellido`, `disciplina_id`, `telefono`, `correo`, `estado`) VALUES
 (1, '8978101', 'fulano ', 'marruecos', 1, '04247159074', 'fulanomar@gmail.com', 'inactivo'),
-(2, '12345', 'dfadfaf', 'adfafasfasd', 2, '12455314', 'afkja@gmail.com', 'inactivo');
+(2, '12345', 'dfadfaf', 'adfafasfasd', 2, '12455314', 'afkja@gmail.com', 'activo');
 
 -- --------------------------------------------------------
 
@@ -344,7 +351,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `actividades`
 --
 ALTER TABLE `actividades`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `administrador`
@@ -368,7 +375,7 @@ ALTER TABLE `disciplinas`
 -- AUTO_INCREMENT de la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `entrenadores`

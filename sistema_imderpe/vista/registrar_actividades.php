@@ -7,8 +7,14 @@ if (!isset($_SESSION['usuario_nombre'])) {
 require_once '../controlador/conexion.php';
 
 $res_empleados = $conexion->query("SELECT id, nombre, apellido, cargo FROM empleados WHERE estado = 'activo' ORDER BY nombre ASC");
-
 $res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER BY nombre_tipo ASC");
+
+$empleados_array = [];
+if ($res_empleados && $res_empleados->num_rows > 0) {
+    while($e = $res_empleados->fetch_assoc()) {
+        $empleados_array[] = $e;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -22,29 +28,13 @@ $res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER
 </head>
 <body>
     <div class="login-container">
-        <div class="glass-form">
+        <form action="../controlador/controlador_registrar_actividad.php" method="POST" enctype="multipart/form-data" class="glass-form">
             <div class="logo-container">
                 <img src="../estilo/logo.png" alt="Logo IMDERPE" class="logo-form">
             </div>
             <h2 class="form-title">Registro de Actividad</h2>
 
-            <div class="extra-action-container">
-                <button type="button" class="btn-secondary" id="btn-toggle-tipo">
-                    <i class="fas fa-plus-circle"></i> Nuevo Tipo de Actividad
-                </button>
-                
-                <div class="mini-form-collapse" id="mini-form-tipo" style="display: none;">
-                    <form action="../controlador/controlador_registrar_tipo_actividad.php" method="POST">
-                        <div class="input-group">
-                            <i class="fas fa-tags"></i>
-                            <input type="text" name="nuevo_tipo" placeholder="Nombre del nuevo tipo (Ej: Reunión)" required>
-                        </div>
-                        <button type="submit" name="btn_guardar_tipo" value="ok" class="btn-save-mini">Guardar y Seleccionar</button>
-                    </form>
-                </div>
-            </div>
-
-            <form action="../controlador/controlador_registrar_actividad.php" method="POST">
+            <div class="form-grid">
                 
                 <div class="input-group">
                     <i class="fas fa-running"></i>
@@ -66,74 +56,141 @@ $res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER
                     <select name="tipo_id" id="tipo_id" required>
                         <option value="" disabled selected>Seleccione Tipo de Actividad</option>
                         <?php if($res_tipos && $res_tipos->num_rows > 0): ?>
-                            <?php while($t = $res_tipos->fetch_assoc()): ?>
-                                <option value="<?php echo $t['id']; ?>" <?php echo (isset($_GET['nuevo_tipo_id']) && $_GET['nuevo_tipo_id'] == $t['id']) ? 'selected' : ''; ?>>
+                            <?php foreach($res_tipos as $t): ?>
+                                <option value="<?php echo $t['id']; ?>">
                                     <?php echo htmlspecialchars($t['nombre_tipo']); ?>
                                 </option>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         <?php else: ?>
-                            <option value="recreativa">Recreativa</option>
-                            <option value="deportiva">Deportiva</option>
-                            <option value="limpieza">Limpieza</option>
-                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="1">Recreativa</option>
+                            <option value="2">Deportiva</option>
                         <?php endif; ?>
                     </select>
                 </div>
 
-                <div class="input-group">
-                    <i class="fas fa-user-shield"></i>
-                    <select name="empleado_id" id="empleado_id" required disabled>
-                        <option value="" disabled selected>Primero seleccione una actividad...</option>
-                        <?php while($e = $res_empleados->fetch_assoc()): ?>
-                            <option value="<?php echo $e['id']; ?>">
-                                <?php echo htmlspecialchars($e['nombre'] . " " . $e['apellido'] . " - " . $e['cargo']); ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
+                <div class="input-group full-width">
+                    <i class="fas fa-book-open" style="top: 22px;"></i>
+                    <textarea name="resena" placeholder="Escriba una breve reseña histórica de la actividad..." rows="3"></textarea>
                 </div>
 
+                <div class="responsables-section full-width">
+                    <label class="section-label"><i class="fas fa-users"></i> Asignación de Responsables</label>
+                    <div id="contenedor-responsables">
+                        <div class="responsable-row">
+                            <div class="input-group field-dinamico">
+                                <i class="fas fa-user-shield"></i>
+                                <select name="empleado_id[]" required disabled class="select-responsable">
+                                    <option value="" disabled selected>Primero seleccione una actividad...</option>
+                                    <?php foreach($empleados_array as $e): ?>
+                                        <option value="<?php echo $e['id']; ?>">
+                                            <?php echo htmlspecialchars($e['nombre'] . " " . $e['apellido'] . " - " . $e['cargo']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <button type="button" class="btn-dinamico add" id="btn-add-responsable" disabled title="Añadir Responsable">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="multimedia-section full-width">
+                    <div class="file-group">
+                        <label class="file-label" for="foto_actividad">
+                            <i class="fas fa-camera"></i> Subir Foto de la Actividad
+                        </label>
+                        <input type="file" id="foto_actividad" name="foto_actividad" accept="image/*">
+                    </div>
+                    <div class="preview-container" id="preview-box" style="display: none;">
+                        <img id="img-preview" src="" alt="Vista previa de la actividad">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="action-row">
                 <button type="submit" name="btn_registrar" value="ok" class="btn-register">Registrar Actividad</button>
                 <a href="inicio.php" class="btn-cancel">Cancelar y Volver</a>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 
     <script>
-        document.getElementById('btn-toggle-tipo').addEventListener('click', function() {
-            var miniForm = document.getElementById('mini-form-tipo');
-            if (miniForm.style.display === 'none') {
-                miniForm.style.display = 'block';
-                this.innerHTML = '<i class="fas fa-times-circle"></i> Cerrar Formulario';
-                this.style.background = '#dc3545';
+        const listaEmpleados = <?php echo json_encode($empleados_array); ?>;
+        const tipoActividadSelect = document.getElementById('tipo_id');
+        const btnAddResponsable = document.getElementById('btn-add-responsable');
+        const contenedorResponsables = document.getElementById('contenedor-responsables');
+
+        tipoActividadSelect.addEventListener('change', function() {
+            const selects = document.querySelectorAll('.select-responsable');
+            if (this.value !== "") {
+                btnAddResponsable.disabled = false;
+                selects.forEach(select => {
+                    select.disabled = false;
+                    if (select.querySelector('option[value=""]')) {
+                        select.querySelector('option[value=""]').textContent = "Seleccione Responsable";
+                    }
+                });
             } else {
-                miniForm.style.display = 'none';
-                this.innerHTML = '<i class="fas fa-plus-circle"></i> Nuevo Tipo de Actividad';
-                this.style.background = '#17a2b8';
+                btnAddResponsable.disabled = true;
+                contenedorResponsables.innerHTML = `
+                    <div class="responsable-row">
+                        <div class="input-group field-dinamico">
+                            <i class="fas fa-user-shield"></i>
+                            <select name="empleado_id[]" required disabled class="select-responsable">
+                                <option value="" disabled selected>Primero seleccione una actividad...</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn-dinamico add" id="btn-add-responsable" disabled><i class="fas fa-plus"></i></button>
+                    </div>`;
             }
         });
 
-        const tipoActividadSelect = document.getElementById('tipo_id');
-        const empleadoSelect = document.getElementById('empleado_id');
+        contenedorResponsables.addEventListener('click', function(e) {
+            if (e.target.closest('#btn-add-responsable')) {
+                const nuevaFila = document.createElement('div');
+                nuevaFila.classList.add('responsable-row', 'animated-row');
 
-        if (tipoActividadSelect.value !== "") {
-            empleadoSelect.disabled = false;
-            if (empleadoSelect.querySelector('option[value=""]')) {
-                empleadoSelect.querySelector('option[value=""]').textContent = "Seleccione Responsable";
+                let opciones = '<option value="" disabled selected>Seleccione Responsable</option>';
+                listaEmpleados.forEach(e => {
+                    opciones += `<option value="${e.id}">${e.nombre} ${e.apellido} - ${e.cargo}</option>`;
+                });
+
+                nuevaFila.innerHTML = `
+                    <div class="input-group field-dinamico">
+                        <i class="fas fa-user-shield"></i>
+                        <select name="empleado_id[]" required class="select-responsable">
+                            ${opciones}
+                        </select>
+                    </div>
+                    <button type="button" class="btn-dinamico remove" title="Quitar Responsable">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                `;
+                contenedorResponsables.appendChild(nuevaFila);
             }
-        }
 
-        tipoActividadSelect.addEventListener('change', function() {
-            if (this.value !== "") {
-                empleadoSelect.disabled = false;
-                if (empleadoSelect.querySelector('option[value=""]')) {
-                    empleadoSelect.querySelector('option[value=""]').textContent = "Seleccione Responsable";
+            if (e.target.closest('.btn-dinamico.remove')) {
+                const fila = e.target.closest('.responsable-row');
+                fila.remove();
+            }
+        });
+
+        document.getElementById('foto_actividad').addEventListener('change', function(e) {
+            const previewBox = document.getElementById('preview-box');
+            const imgPreview = document.getElementById('img-preview');
+            const file = e.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imgPreview.src = event.target.result;
+                    previewBox.style.display = 'block';
                 }
+                reader.readAsDataURL(file);
             } else {
-                empleadoSelect.disabled = true;
-                empleadoSelect.value = "";
-                if (empleadoSelect.querySelector('option[value=""]')) {
-                    empleadoSelect.querySelector('option[value=""]').textContent = "Primero seleccione una actividad...";
-                }
+                previewBox.style.display = 'none';
             }
         });
     </script>

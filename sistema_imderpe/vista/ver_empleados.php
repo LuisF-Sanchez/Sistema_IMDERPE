@@ -31,11 +31,12 @@ require_once '../controlador/controlador_empleados.php';
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Cédula</th>
-                            <th>Nombre</th>
+                            <th>Empleado</th>
                             <th>Apellido</th>
                             <th>Cargo</th>
+                            <th>Fecha de Ingreso</th>
+                            <th>Años de Servicio</th>
                             <th>Teléfono</th>
                             <th>Correo</th>
                             <th>Estado</th>
@@ -45,14 +46,61 @@ require_once '../controlador/controlador_empleados.php';
                     <tbody>
                         <?php while($row = $resultado->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td><?php echo htmlspecialchars($row['cedula']); ?></td>
-                                <td><?php echo htmlspecialchars($row['nombre']); ?></td>
+                                <td><strong><?php echo htmlspecialchars($row['cedula']); ?></strong></td>
+                                <td>
+                                    <div class="col-empleado">
+                                        <?php 
+                                        if (!empty($row['foto']) && $row['foto'] !== 'defaultavatar.png' && file_exists("../fotos_empleados/" . $row['foto'])) {
+                                            $ruta_foto = "../fotos_empleados/" . $row['foto'];
+                                        } else {
+                                            $ruta_foto = "../estilo/defaultavatar.png";
+                                        }
+                                        ?>
+                                        <img src="<?php echo $ruta_foto; ?>?v=<?php echo time(); ?>" 
+                                             alt="Foto" 
+                                             class="avatar-tabla" 
+                                             style="cursor: pointer;" 
+                                             onclick="ampliarImagen('<?php echo $ruta_foto; ?>')">
+                                        <span><?php echo htmlspecialchars($row['nombre']); ?></span>
+                                    </div>
+                                </td>
                                 <td><?php echo htmlspecialchars($row['apellido']); ?></td>
                                 <td>
                                     <span class="badge-cargo">
                                         <?php echo htmlspecialchars($row['cargo']); ?>
                                     </span>
+                                </td>
+                                <!-- Columna 1: Muestra solo la fecha limpia en formato día/mes/año -->
+                                <td>
+                                    <?php 
+                                    if (!empty($row['fecha_ingreso'])) {
+                                        $date = new DateTime($row['fecha_ingreso']);
+                                        echo $date->format('j/n/Y'); // Formato ejemplo: 12/7/2025
+                                    } else {
+                                        echo '<span class="text-por-asignar">Por asignar</span>';
+                                    }
+                                    ?>
+                                </td>
+                                <!-- Columna 2: Calcula y muestra los años de servicio automáticamente -->
+                                <td>
+                                    <?php 
+                                    if (!empty($row['fecha_ingreso'])) {
+                                        $fecha_ingreso = new DateTime($row['fecha_ingreso']);
+                                        $hoy = new DateTime();
+                                        $diferencia = $hoy->diff($fecha_ingreso);
+                                        $anios = $diferencia->y;
+
+                                        if ($anios == 0) {
+                                            echo '<span class="badge-antiguedad">Menos de 1 año</span>';
+                                        } elseif ($anios == 1) {
+                                            echo '<span class="badge-antiguedad">1 Año</span>';
+                                        } else {
+                                            echo '<span class="badge-antiguedad">' . $anios . ' Años</span>';
+                                        }
+                                    } else {
+                                        echo '<span class="text-por-asignar">Por asignar</span>';
+                                    }
+                                    ?>
                                 </td>
                                 <td><?php echo htmlspecialchars($row['telefono']); ?></td>
                                 <td><?php echo htmlspecialchars($row['correo']); ?></td>
@@ -65,19 +113,21 @@ require_once '../controlador/controlador_empleados.php';
                                     </span>
                                 </td>
                                 <td class="action-cell">
-                                    <a href="editar_empleado.php?id=<?php echo $row['id']; ?>" class="btn-table edit">
-                                        <i class="fas fa-edit"></i> Editar
-                                    </a>
-                                    
-                                    <?php if ($row['estado'] == 'activo'): ?>
-                                        <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=activo" class="btn-inactivar">
-                                            <i class="fas fa-user-slash"></i> Inactivar
+                                    <div class="action-buttons-wrapper">
+                                        <a href="editar_empleado.php?id=<?php echo $row['id']; ?>" class="btn-table edit">
+                                            <i class="fas fa-edit"></i> Editar
                                         </a>
-                                    <?php else: ?>
-                                        <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=inactivo" class="btn-activar">
-                                            <i class="fas fa-user-check"></i> Activar
-                                        </a>
-                                    <?php endif; ?>
+                                        
+                                        <?php if ($row['estado'] == 'activo'): ?>
+                                            <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=activo" class="btn-inactivar">
+                                                <i class="fas fa-user-slash"></i> Inactivar
+                                            </a>
+                                        <?php else: ?>
+                                            <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=inactivo" class="btn-activar">
+                                                <i class="fas fa-user-check"></i> Activar
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -92,11 +142,27 @@ require_once '../controlador/controlador_empleados.php';
         </div>
     </main>
 
+    <div id="imageModal" class="image-modal" onclick="cerrarImagen()">
+        <img id="imgModalTarget" src="" alt="Foto ampliada">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         function limpiarURL() {
             window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        function ampliarImagen(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('imgModalTarget');
+            modalImg.src = src; 
+            modal.classList.add('active'); 
+        }
+
+        function cerrarImagen() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active'); 
         }
 
         <?php if (isset($_GET['registro']) && $_GET['registro'] == 'exito'): ?>

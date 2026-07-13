@@ -8,6 +8,7 @@ if (!isset($_SESSION['usuario_nombre'])) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - IMDERPE</title>
@@ -67,5 +68,20 @@ if (!isset($_SESSION['usuario_nombre'])) {
     <main class="central-container">
         <h1 class="main-title">Panel de Control Deportivo</h1>
     </main>
+    <?php if (isset($_GET['registro_actividad_exito']) && $_GET['registro_actividad_exito'] == 1): ?>
+<script>
+    Swal.fire({
+        title: '¡Registro Exitoso!',
+        text: 'La actividad se ha guardado correctamente en el sistema.',
+        icon: 'success',
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'Aceptar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+    });
+</script>
+<?php endif; ?>
 </body>
 </html>

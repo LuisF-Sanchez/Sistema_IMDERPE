@@ -10,41 +10,49 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; /* Garantiza cero desbordamientos */
 }
 
 .login-container {
     width: 100%;
-    max-width: 450px; 
-    padding: 20px;
+    max-width: 720px; /* Expandido en espejo a empleados para dar soporte a las 2 columnas */
+    padding: 15px;
 }
 
 .glass-form {
-    background: rgba(29, 61, 129, 0.5); 
+    background: rgba(29, 61, 129, 0.7); 
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 20px;
-    padding: 40px;
+    padding: 25px 35px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.5);
     text-align: center;
 }
 
 .logo-form {
-    width: 100px;
-    margin-bottom: 15px;
+    width: 85px;
+    margin-bottom: 10px;
 }
 
 .form-title {
     color: white;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-size: 1.5rem;
+    font-size: 1.35rem;
+}
+
+/* Cuadrícula organizada */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
 }
 
 .input-group {
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
 }
 
 .input-group i {
@@ -53,32 +61,34 @@ body {
     top: 50%;
     transform: translateY(-50%);
     color: rgba(255, 255, 255, 0.8);
-    z-index: 1; 
+    z-index: 2; 
 }
 
-.input-group input, .input-group select {
+.input-group input, .input-group select, .input-group textarea {
     width: 100%;
-    padding: 12px 12px 12px 45px;
+    padding: 10px 12px 10px 42px;
     background: rgba(255, 255, 255, 0.1) !important; 
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     color: white;
     outline: none;
     box-sizing: border-box;
-    font-size: 0.95rem;
-    transition: background-color 5000s ease-in-out 0s;
+    font-size: 0.9rem;
+    font-family: inherit;
 }
 
-.input-group input:-webkit-autofill,
-.input-group input:-webkit-autofill:hover, 
-.input-group input:-webkit-autofill:focus {
-    -webkit-text-fill-color: white !important;
-    -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset !important;
-    transition: background-color 5000s ease-in-out 0s;
+/* Forzar ancho completo para filas especiales */
+.full-width {
+    grid-column: span 2;
 }
 
-.input-group input::placeholder {
-    color: rgba(255, 255, 255, 0.9);
+.input-group textarea {
+    padding-top: 10px;
+    resize: none;
+}
+
+.input-group input::placeholder, .input-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .input-group select option {
@@ -86,9 +96,116 @@ body {
     color: white;
 }
 
+/* Estilos de la sección dinámica de Responsables */
+.responsables-section {
+    text-align: left;
+}
+
+.section-label {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.responsable-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.field-dinamico {
+    flex-grow: 1;
+}
+
+.btn-dinamico {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.btn-dinamico.add { background: #17a2b8; }
+.btn-dinamico.add:hover:not(:disabled) { background: #138496; box-shadow: 0 0 8px rgba(23,162,184,0.6); }
+.btn-dinamico.add:disabled { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+
+.btn-dinamico.remove { background: #dc3545; }
+.btn-dinamico.remove:hover { background: #bd2130; box-shadow: 0 0 8px rgba(220,53,69,0.6); }
+
+/* Animación de entrada para filas dinámicas */
+.animated-row {
+    animation: fadeInRow 0.25s ease-out forwards;
+}
+@keyframes fadeInRow {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Multimedia y Vista Previa */
+.file-group {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.file-label {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.file-group input[type="file"] {
+    background: transparent !important;
+    border: none;
+    padding: 2px;
+    font-size: 0.8rem;
+    width: auto;
+    color: white;
+}
+
+/* Recuadro contenedor de la Vista Previa de Imagen */
+.preview-container {
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 100px;
+    display: flex;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.preview-container img {
+    height: 100px;
+    width: auto;
+    object-fit: contain;
+    padding: 4px;
+}
+
+.action-row {
+    margin-top: 15px;
+}
+
 .btn-register {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     background: #28a745; 
     border: none;
     border-radius: 8px;
@@ -97,7 +214,7 @@ body {
     cursor: pointer;
     transition: 0.3s;
     text-transform: uppercase;
-    margin-top: 10px;
+    font-size: 0.95rem;
 }
 
 .btn-register:hover {
@@ -106,8 +223,8 @@ body {
 }
 
 .btn-cancel {
-    display: block;
-    margin-top: 15px;
+    display: inline-block;
+    margin-top: 10px;
     color: white;
     text-decoration: none;
     font-size: 0.85rem;
@@ -123,57 +240,4 @@ body {
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
-}
-
-.extra-action-container {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-}
-
-.btn-secondary {
-    width: 100%;
-    padding: 10px;
-    background: #17a2b8;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.btn-secondary:hover {
-    background: #138496;
-    box-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
-}
-
-.mini-form-collapse {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.btn-save-mini {
-    width: 100%;
-    padding: 10px;
-    background: #007bff;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    transition: 0.3s;
-}
-
-.btn-save-mini:hover {
-    background: #0069d9;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }

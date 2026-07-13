@@ -233,3 +233,162 @@ tr:hover {
     background: #0069d9;
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
+
+.link-ver-mas {
+    color: #FBC02D;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: 0.2s;
+}
+
+.link-ver-mas:hover {
+    color: white;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.detail-page {
+    max-width: 850px;
+}
+
+.layout-detail {
+    padding: 35px !important;
+}
+
+.detail-header {
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.logo-detail {
+    width: 80px;
+    margin-bottom: 10px;
+}
+
+.detail-header h2 {
+    margin: 5px 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.info-badge {
+    display: inline-block;
+    margin-top: 10px;
+    background: #FBC02D !important;
+    color: #1D3D81 !important;
+    font-weight: bold;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    text-align: left;
+}
+
+.detail-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    height: 240px;
+}
+
+.img-reporte-grande {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-photo-placeholder {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.no-photo-placeholder i {
+    font-size: 3.5rem;
+    margin-bottom: 8px;
+}
+
+.detail-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+}
+
+.info-block label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #FBC02D;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+}
+
+.info-block p {
+    margin: 0;
+    font-size: 1.05rem;
+    color: white;
+}
+
+.cargo-subtext {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.detail-full-text {
+    grid-column: span 2;
+    margin-top: 15px;
+}
+
+.detail-full-text h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.15rem;
+    color: #FBC02D;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+.text-box-resena {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px 20px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    min-height: 100px;
+}
+
+.no-resena-text {
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    margin: 0;
+}
+
+.detail-actions {
+    grid-column: span 2;
+    margin-top: 25px;
+    text-align: center;
+}
+
+.detail-actions button {
+    width: auto !important;
+    padding: 10px 30px !important;
+    cursor: pointer;
+}

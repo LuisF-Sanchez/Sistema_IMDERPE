@@ -7,6 +7,7 @@ body {
     background-position: center;
     background-attachment: fixed;
     height: 100vh;
+    overflow-x: hidden; /* Elimina la barra horizontal de toda la pantalla */
 }
 
 .main-header {
@@ -50,6 +51,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 .main-title {
@@ -66,12 +68,12 @@ body {
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 15px;
-    padding: 25px;
-    width: 95%; 
-    max-width: 1200px;
+    padding: 15px;
+    width: 97%; 
+    max-width: 100vw; /* Asegura que el contenedor nunca supere el monitor */
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    overflow-x: auto;
-    margin: 0 auto; 
+    overflow-x: hidden; /* Bloquea desbordamiento interno */
+    margin: 0 auto 30px auto; 
 }
 
 .user-table {
@@ -79,15 +81,25 @@ body {
     border-collapse: collapse;
     color: white;
     text-align: left;
+    table-layout: auto;
 }
 
 .user-table thead tr {
-    background-color: rgba(29, 61, 129, 0.6); 
+    background-color: rgba(255, 255, 255, 0.1); 
     border-bottom: 2px solid white;
 }
 
+.user-table th {
+    color: #FFFF; 
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.72rem; /* Sutil reducción para asimilar la columna extra */
+    letter-spacing: 0.3px;
+}
+
 .user-table th, .user-table td {
-    padding: 15px 20px;
+    padding: 10px 4px; /* Celdas más compactas horizontalmente */
+    white-space: nowrap;
 }
 
 .user-table tbody tr {
@@ -99,24 +111,37 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+.user-table td strong {
+    font-size: 0.8rem;
+}
+
+.user-table td span {
+    font-size: 0.8rem;
+}
+
 .action-cell {
-    display: flex;
-    gap: 10px;
+    text-align: center;
+}
+
+.action-buttons-wrapper {
+    display: inline-flex;
+    gap: 4px;
     justify-content: center;
     align-items: center;
 }
 
 .btn-table, .btn-activar, .btn-inactivar {
     text-decoration: none;
-    padding: 6px 14px;
+    padding: 4px 6px; /* Botones de acción ligeramente más compactos */
     border-radius: 4px;
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     transition: all 0.3s ease;
     border: 1px solid transparent;
+    white-space: nowrap;
 }
 
 .btn-table.edit {
@@ -153,9 +178,9 @@ body {
 }
 
 .badge-estado {
-    padding: 4px 10px;
+    padding: 3px 6px;
     border-radius: 12px;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     font-weight: bold;
     text-transform: uppercase;
     display: inline-block;
@@ -164,15 +189,21 @@ body {
 .estado-activo { background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 1px solid #4caf50; }
 .estado-inactivo { background: rgba(244, 67, 54, 0.2); color: #f44336; border: 1px solid #f44336; }
 
-.user-table thead tr {
-    background-color: rgba(255, 255, 255, 0.1); 
-    border-bottom: 2px solid white;
+.badge-antiguedad {
+    background-color: rgba(29, 61, 129, 0.4);
+    color: #ffffff;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.78rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-block;
 }
 
-.user-table th {
-    color: #FFFF; 
-    font-weight: bold;
-    text-transform: uppercase;
+.text-por-asignar {
+    color: rgba(255, 255, 255, 0.5); 
+    font-style: italic;
+    font-size: 0.8rem;
 }
 
 .swal2-popup {
@@ -188,4 +219,65 @@ body {
 
 .swal2-html-container {
     font-size: 0.95rem !important;
+}
+
+.col-empleado {
+    display: flex;
+    align-items: center;
+    gap: 8px;         
+    text-align: left;
+}
+
+.avatar-tabla {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover; 
+    border: 2px solid #1D3D81; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease; 
+}
+
+.col-empleado:hover .avatar-tabla {
+    transform: scale(1.1);
+}
+
+/* ==========================================================================
+   EFECTO LIGHTBOX / MODAL DE FOTO AMPLIADA
+   ========================================================================== */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75); 
+    backdrop-filter: blur(8px); 
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease; 
+}
+
+.image-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.image-modal img {
+    max-width: 85%;
+    max-height: 80vh;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.image-modal.active img {
+    transform: scale(1);
 }

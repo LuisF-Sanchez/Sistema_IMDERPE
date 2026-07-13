@@ -62,7 +62,7 @@ while ($row = $res_grafica->fetch_assoc()) {
     $total_general_actividades += $row['total']; 
 }
 
-$query_tabla = "SELECT a.nombre_actividad, a.fecha, a.lugar, t.nombre_tipo, e.nombre, e.apellido 
+$query_tabla = "SELECT a.id, a.nombre_actividad, a.fecha, a.lugar, t.nombre_tipo, e.nombre, e.apellido 
                 FROM actividades a
                 INNER JOIN tipos_actividad t ON a.tipo_id = t.id
                 INNER JOIN empleados e ON a.empleado_id = e.id
@@ -124,8 +124,8 @@ $res_tabla = $conexion->query($query_tabla);
             <div class="total-unificado-container" style="display: flex; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 5px;">
                 <div style="background: rgba(29, 61, 129, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 25px; border-radius: 30px; color: white; font-weight: bold; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px;">
                     <i class="fas fa-calculator" style="color: #FBC02D;"></i>
-                    <span>Total General Unificado:</span>
-                    <span style="background: #FBC02D; color: #1D3D81; padding: 2px 12px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; min-width: 30px; text-align: center;">
+                    <span id="texto-total-dinamico">Total General Unificado:</span>
+                    <span id="valor-total-dinamico" style="background: #FBC02D; color: #1D3D81; padding: 2px 12px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; min-width: 30px; text-align: center;">
                         <?php echo $total_general_actividades; ?>
                     </span>
                 </div>
@@ -149,6 +149,7 @@ $res_tabla = $conexion->query($query_tabla);
                             <th>Lugar</th>
                             <th>Tipo</th>
                             <th>Empleado Responsable</th>
+                            <th>Informe</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,11 +161,16 @@ $res_tabla = $conexion->query($query_tabla);
                                     <td><?php echo htmlspecialchars($act['lugar']); ?></td>
                                     <td><span class="badge-tipo"><?php echo htmlspecialchars($act['nombre_tipo']); ?></span></td>
                                     <td><?php echo htmlspecialchars($act['nombre'] . ' ' . $act['apellido']); ?></td>
+                                    <td>
+                                        <a href="detalle_actividad.php?id=<?php echo $act['id']; ?>" target="_blank" class="link-ver-mas">
+                                            <i class="fas fa-eye"></i> Ver más
+                                        </a>
+                                    </td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="no-data">No se encontraron actividades en el rango seleccionado.</td>
+                                <td colspan="6" class="no-data">No se encontraron actividades en el rango seleccionado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -182,6 +188,7 @@ $res_tabla = $conexion->query($query_tabla);
         const ctx = document.getElementById('chartActividades').getContext('2d');
         const labelsTipos = <?php echo json_encode($labels); ?>;
         const datosTotales = <?php echo json_encode($valores); ?>;
+        const totalUnificadoBase = <?php echo $total_general_actividades; ?>;
 
         const finalLabels = labelsTipos.length > 0 ? labelsTipos : ['Sin datos en el rango'];
         const finalData = datosTotales.length > 0 ? datosTotales : [0];
@@ -254,14 +261,19 @@ $res_tabla = $conexion->query($query_tabla);
                             revertirFiltroExterno();
                         } else {
                             const tipoSeleccionado = finalLabels[index];
+                            const valorSeleccionado = finalData[index];
+                            
                             miGrafica.data.labels = [tipoSeleccionado];
-                            miGrafica.data.datasets[0].data = [finalData[index]];
+                            miGrafica.data.datasets[0].data = [valorSeleccionado];
                             miGrafica.data.datasets[0].backgroundColor = [listaColores[index]];
                             miGrafica.data.datasets[0].borderColor = [listaBordes[index]];
                             indiceFiltrado = index;
                             
                             document.getElementById('statusFiltro').innerHTML = 
                                 `<i class="fas fa-filter"></i> Enfocado en: ${tipoSeleccionado} &nbsp;|&nbsp; <span style="cursor:pointer; text-decoration: underline;" onclick="revertirFiltroExterno()">Mostrar todos</span>`;
+                            
+                            document.getElementById('texto-total-dinamico').innerText = "Total de " + tipoSeleccionado + ":";
+                            document.getElementById('valor-total-dinamico').innerText = valorSeleccionado;
                             
                             filtrarTablaHTML(tipoSeleccionado);
                             miGrafica.update();
@@ -292,6 +304,9 @@ $res_tabla = $conexion->query($query_tabla);
             miGrafica.data.datasets[0].borderColor = [...listaBordes];
             indiceFiltrado = null;
             document.getElementById('statusFiltro').innerText = "";
+            
+            document.getElementById('texto-total-dinamico').innerText = "Total General Unificado:";
+            document.getElementById('valor-total-dinamico').innerText = totalUnificadoBase;
             
             const filas = document.querySelectorAll('#tablaAuditoria tbody tr');
             filas.forEach(fila => fila.style.display = '');
