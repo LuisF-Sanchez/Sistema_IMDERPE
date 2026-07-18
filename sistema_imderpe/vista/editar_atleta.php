@@ -59,14 +59,27 @@ if (!isset($atleta)) {
                     <div class="input-group">
                         <label for="genero">Género</label>
                         <select name="genero" id="genero" required>
-                            <option value="Masculino" <?php echo ($atleta['genero'] == 'Masculino') ? 'selected' : ''; ?>>Masculino</option>
-                            <option value="Femenino" <?php echo ($atleta['genero'] == 'Femenino') ? 'selected' : ''; ?>>Femenino</option>
+                            <option value="Masculino" <?php echo ($atleta['genero'] == 'Masculino' || $atleta['genero'] == 'M') ? 'selected' : ''; ?>>Masculino</option>
+                            <option value="Femenino" <?php echo ($atleta['genero'] == 'Femenino' || $atleta['genero'] == 'F') ? 'selected' : ''; ?>>Femenino</option>
                         </select>
                     </div>
 
                     <div class="input-group">
                         <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                         <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" value="<?php echo $atleta['fecha_nacimiento']; ?>" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="comuna">Comuna</label>
+                        <input type="text" name="comuna" id="comuna" value="<?php echo htmlspecialchars($atleta['comuna']); ?>" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="categoria">Categoría</label>
+                        <select name="categoria" id="categoria" required>
+                            <option value="Infantil" <?php echo (strtolower($atleta['categoria']) == 'infantil') ? 'selected' : ''; ?>>Infantil</option>
+                            <option value="Juvenil" <?php echo (strtolower($atleta['categoria']) == 'juvenil') ? 'selected' : ''; ?>>Juvenil</option>
+                        </select>
                     </div>
 
                     <div class="input-group">

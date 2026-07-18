@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once '../controlador/controlador_atletas.php';
+
+$categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -27,6 +29,7 @@ require_once '../controlador/controlador_atletas.php';
         <h1 class="main-title">Panel de Atletas</h1>
         
         <form method="GET" action="" class="filter-form" style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap;">
+            
             <div class="input-group" style="position: relative; margin-bottom: 0; min-width: 200px;">
                 <i class="fas fa-dumbbell" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.8); z-index: 1;"></i>
                 <select name="disciplina" onchange="this.form.submit()" style="width: 100%; padding: 12px 12px 12px 45px; background: #1D3D81; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; color: white; outline: none; box-sizing: border-box; font-size: 0.95rem; cursor: pointer;">
@@ -50,7 +53,16 @@ require_once '../controlador/controlador_atletas.php';
                 </select>
             </div>
 
-            <?php if (!empty($disciplina_filtro) || !empty($genero_filtro)): ?>
+            <div class="input-group" style="position: relative; margin-bottom: 0; min-width: 200px;">
+                <i class="fas fa-child" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.8); z-index: 1;"></i>
+                <select name="categoria" onchange="this.form.submit()" style="width: 100%; padding: 12px 12px 12px 45px; background: #1D3D81; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; color: white; outline: none; box-sizing: border-box; font-size: 0.95rem; cursor: pointer;">
+                    <option value="" style="background: #1D3D81; color: white;">Todas las Categorías</option>
+                    <option value="infantil" <?php echo ($categoria_filtro == 'infantil') ? 'selected' : ''; ?> style="background: #1D3D81; color: white;">Infantil</option>
+                    <option value="juvenil" <?php echo ($categoria_filtro == 'juvenil') ? 'selected' : ''; ?> style="background: #1D3D81; color: white;">Juvenil</option>
+                </select>
+            </div>
+
+            <?php if (!empty($disciplina_filtro) || !empty($genero_filtro) || !empty($categoria_filtro)): ?>
                 <a href="ver_atletas.php" style="padding: 12px 20px; background: #dc3545; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; text-transform: uppercase; box-sizing: border-box;">
                     <i class="fas fa-times-circle" style="margin-right: 8px;"></i> Limpiar
                 </a>
@@ -62,45 +74,45 @@ require_once '../controlador/controlador_atletas.php';
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Cédula</th>
-                            <th>Atleta</th>
-                            <th>Género</th>
-                            <th>Nacimiento</th>
-                            <th>Representante</th>
-                            <th>Entrenador</th>
-                            <th>Disciplina</th>
-                            <th>Estado</th>
-                            <th style="text-align: center;">Acciones</th>
+                            <th class="col-cedula">Cédula</th>
+                            <th class="col-atleta">Atleta</th>
+                            <th class="col-genero">Género</th>
+                            <th class="col-nacimiento">Nacimiento</th>
+                            <th class="col-representante">Representante</th>
+                            <th class="col-entrenador">Entrenador</th>
+                            <th class="col-comuna">Comuna</th>
+                            <th class="col-categoria">Categoría</th>
+                            <th class="col-disciplina">Disciplina</th>
+                            <th class="col-estado" style="text-align: center;">Estado / Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php while($row = $resultado->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
                                 <td><?php echo htmlspecialchars($row['cedula']); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre'] . " " . $row['apellido']); ?></td>
                                 <td><?php echo htmlspecialchars($row['genero']); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($row['fecha_nacimiento'])); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre_rep'] . " " . $row['apellido_rep']); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre_ent'] . " " . $row['apellido_ent']); ?></td>
+                                <td><?php echo htmlspecialchars($row['comuna']); ?></td>
+                                <td style="text-transform: capitalize; font-weight: 500; color: #FBC02D;"><?php echo htmlspecialchars($row['categoria']); ?></td>
                                 <td><span class="badge-disciplina"><?php echo htmlspecialchars($row['disciplina']); ?></span></td>
-                                <td>
-                                    <?php $clase = ($row['estado'] == 'activo') ? 'estado-activo' : 'estado-inactivo'; ?>
-                                    <span class="badge-estado <?php echo $clase; ?>"><?php echo ucfirst($row['estado']); ?></span>
-                                </td>
                                 <td class="action-cell">
-                                    <a href="editar_atleta.php?id=<?php echo $row['id']; ?>" class="btn-table edit">
-                                        <i class="fas fa-edit"></i> Editar
+                                    <?php $clase = ($row['estado'] == 'activo') ? 'estado-activo' : 'estado-inactivo'; ?>
+                                    <span class="badge-estado <?php echo $clase; ?>" style="margin-right: 5px;"><?php echo ucfirst($row['estado']); ?></span>
+
+                                    <a href="editar_atleta.php?id=<?php echo $row['id']; ?>" class="btn-table edit" title="Editar Atleta">
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     
                                     <?php if ($row['estado'] == 'activo'): ?>
-                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=activo" class="btn-inactivar">
-                                            <i class="fas fa-user-slash"></i> Inactivar
+                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=activo" class="btn-inactivar" title="Inactivar">
+                                            <i class="fas fa-user-slash"></i>
                                         </a>
                                     <?php else: ?>
-                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=inactivo" class="btn-activar">
-                                            <i class="fas fa-user-check"></i> Activar
+                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=inactivo" class="btn-activar" title="Activar">
+                                            <i class="fas fa-user-check"></i>
                                         </a>
                                     <?php endif; ?>
                                 </td>
@@ -109,8 +121,8 @@ require_once '../controlador/controlador_atletas.php';
                     </tbody>
                 </table>
             <?php else: ?>
-                <div class="empty-state">
-                    <i class="fas fa-running fa-3x"></i>
+                <div class="empty-state" style="text-align: center; color: white; padding: 40px 0;">
+                    <i class="fas fa-running fa-3x" style="margin-bottom: 15px; color: #FBC02D;"></i>
                     <p>No se encontraron atletas con los filtros aplicados.</p>
                 </div>
             <?php endif; ?>

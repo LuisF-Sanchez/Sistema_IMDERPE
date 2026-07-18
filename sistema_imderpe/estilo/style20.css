@@ -63,7 +63,7 @@ body {
     z-index: 2; 
 }
 
-.input-group input, .input-group select {
+.input-group input {
     width: 100%;
     padding: 10px 12px 10px 42px; 
     background: rgba(255, 255, 255, 0.1) !important; 
@@ -74,11 +74,6 @@ body {
     box-sizing: border-box;
     font-size: 0.9rem;
     transition: background-color 5000s ease-in-out 0s;
-}
-
-.input-group input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); 
-    cursor: pointer;
 }
 
 .input-group input:-webkit-autofill,
@@ -92,41 +87,8 @@ body {
     color: rgba(255, 255, 255, 0.8);
 }
 
-.input-group select option {
-    background: #1D3D81;
-    color: white;
-}
-
-.file-group {
-    grid-column: span 2;
-    margin-top: 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px dashed rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-}
-
-.file-label {
-    color: white;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.file-group input[type="file"] {
-    background: transparent !important;
-    border: none;
-    padding: 2px;
-    font-size: 0.8rem;
-    width: auto;
-}
-
 .action-row {
-    margin-top: 15px;
+    margin-top: 25px;
 }
 
 .btn-register {

@@ -24,7 +24,8 @@ if (!empty($_POST["btn_actualizar"])) {
     $apellido = mysqli_real_escape_string($conexion, $_POST['apellido']);
     $genero = mysqli_real_escape_string($conexion, $_POST['genero']);
     $fecha = $_POST['fecha_nacimiento'];
-    
+    $comuna = mysqli_real_escape_string($conexion, $_POST['comuna']);
+    $categoria = mysqli_real_escape_string($conexion, $_POST['categoria']);
     $representante_id = intval($_POST['representante_id']);
     $entrenador_id = intval($_POST['entrenador_id']);
     $disciplina_id = intval($_POST['disciplina_id']);
@@ -36,6 +37,8 @@ if (!empty($_POST["btn_actualizar"])) {
         apellido = '$apellido', 
         genero = '$genero', 
         fecha_nacimiento = '$fecha', 
+        comuna = '$comuna',
+        categoria = '$categoria',
         representante_id = $representante_id, 
         entrenador_id = $entrenador_id, 
         disciplina_id = $disciplina_id, 

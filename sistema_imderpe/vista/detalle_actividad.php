@@ -13,10 +13,9 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id_actividad = intval($_GET['id']);
 
-$query = "SELECT a.*, t.nombre_tipo, e.nombre, e.apellido, e.cargo 
+$query = "SELECT a.*, t.nombre_tipo 
           FROM actividades a
           INNER JOIN tipos_actividad t ON a.tipo_id = t.id
-          INNER JOIN empleados e ON a.empleado_id = e.id
           WHERE a.id = ?";
           
 $stmt = $conexion->prepare($query);
@@ -31,6 +30,23 @@ if ($resultado->num_rows === 0) {
 
 $act = $resultado->fetch_assoc();
 $stmt->close();
+
+$query_responsables = "SELECT e.nombre, e.apellido, e.cargo 
+                       FROM empleados e
+                       INNER JOIN actividad_responsables ar ON e.id = ar.empleado_id
+                       WHERE ar.actividad_id = ?
+                       ORDER BY e.nombre ASC";
+
+$stmt_resp = $conexion->prepare($query_responsables);
+$stmt_resp->bind_param("i", $id_actividad);
+$stmt_resp->execute();
+$res_responsables = $stmt_resp->get_result();
+
+$funcionarios_lista = [];
+while ($row = $res_responsables->fetch_assoc()) {
+    $funcionarios_lista[] = htmlspecialchars($row['nombre'] . ' ' . $row['apellido']) . ' <span class="cargo-subtext">(' . htmlspecialchars($row['cargo']) . ')</span>';
+}
+$stmt_resp->close();
 $conexion->close();
 ?>
 
@@ -83,8 +99,14 @@ $conexion->close();
                     </div>
 
                     <div class="info-block">
-                        <label><i class="fas fa-user-tie"></i> Funcionario Responsable</label>
-                        <p><?php echo htmlspecialchars($act['nombre'] . ' ' . $act['apellido']); ?> <span class="cargo-subtext">(<?php echo htmlspecialchars($act['cargo']); ?>)</span></p>
+                        <label><i class="fas fa-user-tie"></i> Funcionarios Responsables</label>
+                        <?php if (count($funcionarios_lista) > 0): ?>
+                            <?php foreach ($funcionarios_lista as $func): ?>
+                                <p style="margin-bottom: 5px;"><?php echo $func; ?></p>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>Sin responsables asignados</p>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -101,11 +123,11 @@ $conexion->close();
 
             </div>
 
-<div class="detail-actions">
-    <button onclick="window.close();" class="btn-close-tab">
-        <i class="fas fa-times-circle"></i> Cerrar Pestaña
-    </button>
-</div>
+            <div class="detail-actions">
+                <button onclick="window.close();" class="btn-close-tab">
+                    <i class="fas fa-times-circle"></i> Cerrar Pestaña
+                </button>
+            </div>
 
         </div>
     </div>

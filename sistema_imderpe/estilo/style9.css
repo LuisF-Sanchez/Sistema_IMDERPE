@@ -32,6 +32,12 @@ body {
     border: 1px solid rgba(255,255,255,0.3);
     border-radius: 5px;
     display: inline-block;
+    transition: 0.3s;
+}
+
+.btn-back:hover {
+    background: white;
+    color: #1D3D81;
 }
 
 .central-container {
@@ -73,6 +79,7 @@ input, select, textarea {
     color: white;
     font-size: 1rem;
     outline: none;
+    box-sizing: border-box;
 }
 
 textarea {
@@ -96,6 +103,10 @@ option { background: #1D3D81; color: white; }
     transition: 0.3s;
 }
 
+.btn-add-fast:hover {
+    background: #fbc02dcc;
+}
+
 .btn-submit {
     margin-top: 30px;
     width: 100%;
@@ -111,7 +122,6 @@ option { background: #1D3D81; color: white; }
 }
 
 .btn-submit:hover { background: #fbc02dcc; transform: translateY(-2px); }
-
 
 .modal {
     display: none; 

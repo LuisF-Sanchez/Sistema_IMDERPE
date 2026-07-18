@@ -11,9 +11,7 @@ if (!empty($_POST["btn_registrar"])) {
         $lugar            = $_POST["lugar"];
         $tipo_id          = intval($_POST["tipo_id"]);
         $resena           = !empty($_POST["resena"]) ? $_POST["resena"] : null;
-        
-        $responsables = $_POST["empleado_id"];
-        $empleado_id  = intval($responsables[0]); 
+        $responsables     = $_POST["empleado_id"];
 
         $nombre_foto = null;
 
@@ -32,10 +30,24 @@ if (!empty($_POST["btn_registrar"])) {
             move_uploaded_file($file_tmp, $directorio_destino . $nombre_foto);
         }
 
-        $sql = $conexion->prepare("INSERT INTO actividades (nombre_actividad, fecha, lugar, tipo_id, empleado_id, resena, foto_actividad) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $sql->bind_param("sssiiss", $nombre_actividad, $fecha, $lugar, $tipo_id, $empleado_id, $resena, $nombre_foto);
+        $sql = $conexion->prepare("INSERT INTO actividades (nombre_actividad, fecha, lugar, tipo_id, resena, foto_actividad) VALUES (?, ?, ?, ?, ?, ?)");
+        $sql->bind_param("sssiss", $nombre_actividad, $fecha, $lugar, $tipo_id, $resena, $nombre_foto);
 
         if ($sql->execute()) {
+            $actividad_id = $conexion->insert_id;
+            
+            $responsables_unicos = array_unique($responsables);
+            
+            $sql_resp = $conexion->prepare("INSERT INTO actividad_responsables (actividad_id, empleado_id) VALUES (?, ?)");
+            foreach ($responsables_unicos as $emp_id) {
+                $id_empleado_int = intval($emp_id);
+                if ($id_empleado_int > 0) {
+                    $sql_resp->bind_param("ii", $actividad_id, $id_empleado_int);
+                    $sql_resp->execute();
+                }
+            }
+            $sql_resp->close();
+
             header("Location: ../vista/inicio.php?registro_actividad_exito=1");
             exit();
         } else {

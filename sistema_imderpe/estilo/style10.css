@@ -41,7 +41,7 @@ body {
 }
 
 .central-container {
-    padding: 100px 20px 40px;
+    padding: 120px 20px 40px;
     display: flex;
     justify-content: center;
 }
@@ -80,6 +80,8 @@ input, select {
     background: rgba(255,255,255,0.1);
     color: white;
     font-size: 1rem;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 input:focus { border-color: #FBC02D; outline: none; }

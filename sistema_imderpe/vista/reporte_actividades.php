@@ -62,11 +62,14 @@ while ($row = $res_grafica->fetch_assoc()) {
     $total_general_actividades += $row['total']; 
 }
 
-$query_tabla = "SELECT a.id, a.nombre_actividad, a.fecha, a.lugar, t.nombre_tipo, e.nombre, e.apellido 
+$query_tabla = "SELECT a.id, a.nombre_actividad, a.fecha, a.lugar, t.nombre_tipo, 
+                       GROUP_CONCAT(CONCAT(e.nombre, ' ', e.apellido) SEPARATOR ', ') AS responsables
                 FROM actividades a
                 INNER JOIN tipos_actividad t ON a.tipo_id = t.id
-                INNER JOIN empleados e ON a.empleado_id = e.id
+                LEFT JOIN actividad_responsables ar ON a.id = ar.actividad_id
+                LEFT JOIN empleados e ON ar.empleado_id = e.id
                 $filtro_sql 
+                GROUP BY a.id, t.nombre_tipo
                 ORDER BY a.fecha DESC";
 $res_tabla = $conexion->query($query_tabla);
 ?>
@@ -148,7 +151,7 @@ $res_tabla = $conexion->query($query_tabla);
                             <th>Fecha</th>
                             <th>Lugar</th>
                             <th>Tipo</th>
-                            <th>Empleado Responsable</th>
+                            <th>Empleado(s) Responsable(s)</th>
                             <th>Informe</th>
                         </tr>
                     </thead>
@@ -160,7 +163,7 @@ $res_tabla = $conexion->query($query_tabla);
                                     <td><?php echo date('d/m/Y', strtotime($act['fecha'])); ?></td>
                                     <td><?php echo htmlspecialchars($act['lugar']); ?></td>
                                     <td><span class="badge-tipo"><?php echo htmlspecialchars($act['nombre_tipo']); ?></span></td>
-                                    <td><?php echo htmlspecialchars($act['nombre'] . ' ' . $act['apellido']); ?></td>
+                                    <td><?php echo !empty($act['responsables']) ? htmlspecialchars($act['responsables']) : 'Sin responsables asignados'; ?></td>
                                     <td>
                                         <a href="detalle_actividad.php?id=<?php echo $act['id']; ?>" target="_blank" class="link-ver-mas">
                                             <i class="fas fa-eye"></i> Ver más

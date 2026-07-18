@@ -10,12 +10,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Garantiza cero desbordamientos */
+    overflow: hidden; 
 }
 
 .login-container {
     width: 100%;
-    max-width: 720px; /* Expandido en espejo a empleados para dar soporte a las 2 columnas */
+    max-width: 720px; 
     padding: 15px;
 }
 
@@ -43,7 +43,6 @@ body {
     font-size: 1.35rem;
 }
 
-/* Cuadrícula organizada */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -77,7 +76,6 @@ body {
     font-family: inherit;
 }
 
-/* Forzar ancho completo para filas especiales */
 .full-width {
     grid-column: span 2;
 }
@@ -96,7 +94,6 @@ body {
     color: white;
 }
 
-/* Estilos de la sección dinámica de Responsables */
 .responsables-section {
     text-align: left;
 }
@@ -143,7 +140,6 @@ body {
 .btn-dinamico.remove { background: #dc3545; }
 .btn-dinamico.remove:hover { background: #bd2130; box-shadow: 0 0 8px rgba(220,53,69,0.6); }
 
-/* Animación de entrada para filas dinámicas */
 .animated-row {
     animation: fadeInRow 0.25s ease-out forwards;
 }
@@ -152,7 +148,6 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Multimedia y Vista Previa */
 .file-group {
     background: rgba(255, 255, 255, 0.05);
     border: 1px dashed rgba(255, 255, 255, 0.3);
@@ -180,7 +175,6 @@ body {
     color: white;
 }
 
-/* Recuadro contenedor de la Vista Previa de Imagen */
 .preview-container {
     margin-top: 10px;
     border-radius: 8px;

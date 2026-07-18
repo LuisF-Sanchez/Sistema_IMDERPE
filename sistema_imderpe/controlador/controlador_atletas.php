@@ -3,6 +3,7 @@ require_once 'conexion.php';
 
 $disciplina_filtro = isset($_GET['disciplina']) ? $_GET['disciplina'] : '';
 $genero_filtro = isset($_GET['genero']) ? $_GET['genero'] : '';
+$categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
 
 $sql = "SELECT 
             a.id, 
@@ -11,6 +12,8 @@ $sql = "SELECT
             a.apellido, 
             a.genero,
             a.fecha_nacimiento,
+            a.comuna,
+            a.categoria,
             a.estado,
             r.nombre AS nombre_rep, 
             r.apellido AS apellido_rep,
@@ -36,6 +39,14 @@ if (!empty($genero_filtro)) {
     $params[] = $genero_filtro;
     $types .= "s";
 }
+
+if (!empty($categoria_filtro)) {
+    $sql .= " AND a.categoria = ?";
+    $params[] = $categoria_filtro;
+    $types .= "s";
+}
+
+$sql .= " ORDER BY a.id DESC";
 
 $stmt = $conexion->prepare($sql);
 

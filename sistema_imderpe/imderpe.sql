@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-07-2026 a las 17:02:13
+-- Tiempo de generación: 18-07-2026 a las 02:15:29
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -33,7 +33,6 @@ CREATE TABLE `actividades` (
   `fecha` date NOT NULL,
   `lugar` varchar(255) NOT NULL,
   `tipo_id` int(11) NOT NULL,
-  `empleado_id` int(11) NOT NULL,
   `resena` text DEFAULT NULL,
   `foto_actividad` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -42,13 +41,15 @@ CREATE TABLE `actividades` (
 -- Volcado de datos para la tabla `actividades`
 --
 
-INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`, `empleado_id`, `resena`, `foto_actividad`) VALUES
-(1, 'Rally deportivo', '2026-05-22', 'Plaza Bolivar', 2, 6, NULL, NULL),
-(2, 'Rally deportivo', '2026-05-23', 'Plaza Bolivar', 2, 6, NULL, NULL),
-(3, 'mantenimiento a la cancha', '2026-05-30', 'limoncito', 4, 5, NULL, NULL),
-(4, 'carrera de bici ', '2026-05-31', 'avenida ', 2, 6, NULL, NULL),
-(5, 'Construcción de nueva cancha', '2026-06-13', 'Villanueva', 5, 1, NULL, NULL),
-(6, 'actividad ejemplar', '2026-07-12', 'lugar ejemplar', 1, 2, 'Este texto es ejemplar para probar el detalle histórico', 'actividad_1783913321.jpg');
+INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`, `resena`, `foto_actividad`) VALUES
+(1, 'Rally deportivo', '2026-05-22', 'Plaza Bolivar', 2, NULL, NULL),
+(2, 'Rally deportivo', '2026-05-23', 'Plaza Bolivar', 2, NULL, NULL),
+(3, 'mantenimiento a la cancha', '2026-05-30', 'limoncito', 4, NULL, NULL),
+(4, 'carrera de bici ', '2026-05-31', 'avenida ', 2, NULL, NULL),
+(5, 'Construcción de nueva cancha', '2026-06-13', 'Villanueva', 5, NULL, NULL),
+(6, 'actividad ejemplar', '2026-07-12', 'lugar ejemplar', 1, 'Este texto es ejemplar para probar el detalle histórico', 'actividad_1783913321.jpg'),
+(7, 'Ciclismo atletico', '2026-07-15', 'En las villas', 2, 'Breve texto de ejemplo', 'actividad_1784133022.jfif'),
+(8, 'Carrera Deporitva', '2026-07-11', 'Avenida perimetral ', 2, 'Este es un texto para probar que funciona la reseña historica', 'actividad_1784134572.jpg');
 
 -- --------------------------------------------------------
 
@@ -87,6 +88,8 @@ CREATE TABLE `atletas` (
   `fecha_nacimiento` date DEFAULT NULL,
   `genero` enum('masculino','femenino') NOT NULL,
   `estado` enum('activo','inactivo','suspendido') NOT NULL,
+  `categoria` enum('infantil','juvenil') NOT NULL,
+  `comuna` varchar(100) NOT NULL,
   `representante_id` int(150) NOT NULL,
   `entrenador_id` int(11) NOT NULL,
   `disciplina_id` int(11) NOT NULL
@@ -96,11 +99,11 @@ CREATE TABLE `atletas` (
 -- Volcado de datos para la tabla `atletas`
 --
 
-INSERT INTO `atletas` (`id`, `cedula`, `nombre`, `apellido`, `fecha_nacimiento`, `genero`, `estado`, `representante_id`, `entrenador_id`, `disciplina_id`) VALUES
-(1, '30123456', 'pedro', 'Reina', '2006-08-08', 'masculino', 'activo', 1, 1, 1),
-(2, '99998888', 'pochita', 'cascada', '2026-05-08', 'femenino', 'activo', 2, 1, 2),
-(3, '3423432523', 'dfsaasfasdf', 'adfdafadsfsa', '2026-05-09', 'femenino', 'activo', 1, 1, 3),
-(4, '123456', 'juan', 'perez', '2026-03-10', 'masculino', 'activo', 4, 1, 1);
+INSERT INTO `atletas` (`id`, `cedula`, `nombre`, `apellido`, `fecha_nacimiento`, `genero`, `estado`, `categoria`, `comuna`, `representante_id`, `entrenador_id`, `disciplina_id`) VALUES
+(1, '30123456', 'pedro', 'Reina', '2006-08-08', 'masculino', 'activo', 'infantil', '', 1, 1, 1),
+(2, '99998888', 'pochita', 'cascada', '2026-05-08', 'femenino', 'activo', 'infantil', '', 2, 1, 2),
+(3, '3423432523', 'dfsaasfasdf', 'adfdafadsfsa', '2026-05-09', 'masculino', 'activo', 'infantil', 'villa', 1, 1, 1),
+(4, '123456', 'juan', 'perez', '2026-03-10', 'masculino', 'activo', 'infantil', 'jobito', 4, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -118,9 +121,13 @@ CREATE TABLE `disciplinas` (
 --
 
 INSERT INTO `disciplinas` (`id`, `nombre_disciplina`) VALUES
-(1, 'fútbol'),
-(2, 'beisbol'),
-(3, 'volleyball');
+(1, 'Fútbol'),
+(2, 'Beisbol'),
+(3, 'Beisbol five'),
+(4, 'Boxeo'),
+(5, 'Ciclismo'),
+(6, 'Atletismo'),
+(7, 'Kickingbol');
 
 -- --------------------------------------------------------
 
@@ -152,7 +159,8 @@ INSERT INTO `empleados` (`id`, `cedula`, `nombre`, `apellido`, `foto`, `cargo`, 
 (5, '21781408', 'ciruela', 'pollito', 'defaultavatar.png', 'Por asignar', '532414123', 'papas@gmail.com', 'activo', NULL),
 (6, '2353', 'chinchulin', 'dfwewq', 'defaultavatar.png', 'Por asignar', '13123214', 'asdasdqg@gmail.com', 'activo', NULL),
 (7, '17612823', 'Joan', 'Escalona', 'empleado_17.612.823_1783620820.jfif', 'Presidente', '04269987345', 'joanpro@gmail.com', 'activo', '2025-08-01'),
-(8, '21130372', 'keily', 'mendez', 'empleado_21130372_1783620990.jfif', 'Analista de RRHH', '0414175933', 'keily@gmail.com', 'activo', '2024-07-09');
+(8, '21130372', 'keily', 'mendez', 'empleado_21130372_1783620990.jfif', 'Analista de RRHH', '0414175933', 'keily@gmail.com', 'activo', '2024-07-09'),
+(9, '324113', 'asfafa', 'asfasfasfasf', 'defaultavatar.png', 'Obrero Fijo', '1413124', 'wqiuhrfuwaq@gmail.com', 'activo', '2026-07-16');
 
 -- --------------------------------------------------------
 
@@ -176,7 +184,7 @@ CREATE TABLE `entrenadores` (
 --
 
 INSERT INTO `entrenadores` (`id`, `cedula`, `nombre`, `apellido`, `disciplina_id`, `telefono`, `correo`, `estado`) VALUES
-(1, '8978101', 'fulano ', 'marruecos', 1, '04247159074', 'fulanomar@gmail.com', 'inactivo'),
+(1, '8978101', 'fulano ', 'marruecos', 1, '04247159074', 'fulanomar@gmail.com', 'activo'),
 (2, '12345', 'dfadfaf', 'adfafasfasd', 2, '12455314', 'afkja@gmail.com', 'activo');
 
 -- --------------------------------------------------------
@@ -213,7 +221,7 @@ CREATE TABLE `representantes` (
 
 INSERT INTO `representantes` (`id`, `cedula`, `nombre`, `apellido`, `telefono`, `correo`, `direccion`) VALUES
 (1, '10833678', 'carlitos', 'londres', '04261993043', '', 'sabanita'),
-(2, '898989898', 'alvarado', 'monserat', '04122128830', 'alvaradox9@gmail.com', 'casa club'),
+(2, '898989898', 'alvaradok', 'monserat', '04122128830', 'alvaradox9@gmail.com', 'casa club'),
 (3, '423414', 'dsgsdgsg', 'dfhdfghds', '322523423', '', 'sfdagsagsdf'),
 (4, '323231', 'dsgsdgsfff', 'fdafdfafd', '22421324', '', 'accacacaca'),
 (5, '10182109', 'Yoswar', 'Mendez', '04264414253', '', 'Sabanita');
@@ -271,8 +279,7 @@ INSERT INTO `usuarios` (`id`, `nombre`, `cedula`, `telefono`, `correo`, `contras
 -- Indices de la tabla `actividades`
 --
 ALTER TABLE `actividades`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `empleado_id` (`empleado_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `administrador`
@@ -351,7 +358,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `actividades`
 --
 ALTER TABLE `actividades`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `administrador`
@@ -369,13 +376,13 @@ ALTER TABLE `atletas`
 -- AUTO_INCREMENT de la tabla `disciplinas`
 --
 ALTER TABLE `disciplinas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `entrenadores`
@@ -412,17 +419,10 @@ ALTER TABLE `usuarios`
 --
 
 --
--- Filtros para la tabla `actividades`
---
-ALTER TABLE `actividades`
-  ADD CONSTRAINT `actividades_ibfk_1` FOREIGN KEY (`empleado_id`) REFERENCES `empleados` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Filtros para la tabla `atletas`
 --
 ALTER TABLE `atletas`
-  ADD CONSTRAINT `atletas_ibfk_1` FOREIGN KEY (`representante_id`) REFERENCES `representantes` (`id`),
-  ADD CONSTRAINT `fk_disciplina_atleta` FOREIGN KEY (`disciplina_id`) REFERENCES `disciplinas` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `atletas_ibfk_1` FOREIGN KEY (`representante_id`) REFERENCES `representantes` (`id`);
 
 --
 -- Filtros para la tabla `entrenadores`

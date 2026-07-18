@@ -63,6 +63,22 @@ $res_disciplinas = $conexion->query("SELECT id, nombre_disciplina FROM disciplin
                         </select>
                     </div>
 
+                    <!-- NUEVO CAMPO: COMUNA -->
+                    <div class="input-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Comuna</label>
+                        <input type="text" name="comuna" placeholder="Ej: Comuna La Guadalupe" required>
+                    </div>
+
+                    <!-- NUEVO CAMPO: CATEGORÍA -->
+                    <div class="input-group">
+                        <label><i class="fas fa-layer-group"></i> Categoría</label>
+                        <select name="categoria" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Infantil">Infantil</option>
+                            <option value="Juvenil">Juvenil</option>
+                        </select>
+                    </div>
+
                     <div class="input-group">
                         <label><i class="fas fa-trophy"></i> Disciplina</label>
                         <select name="disciplina_id" required>

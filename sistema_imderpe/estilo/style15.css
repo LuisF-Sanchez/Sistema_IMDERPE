@@ -29,7 +29,6 @@ body {
     margin-bottom: 30px;
 }
 
-/* Sección de la gráfica */
 .header-report {
     display: flex;
     justify-content: space-between;
@@ -76,7 +75,6 @@ body {
     width: 100%;
 }
 
-/* Sección de la tabla */
 .table-header-actions {
     display: flex;
     justify-content: space-between;
