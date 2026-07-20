@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-07-2026 a las 02:15:29
+-- Tiempo de generación: 19-07-2026 a las 06:09:36
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -50,29 +50,6 @@ INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`
 (6, 'actividad ejemplar', '2026-07-12', 'lugar ejemplar', 1, 'Este texto es ejemplar para probar el detalle histórico', 'actividad_1783913321.jpg'),
 (7, 'Ciclismo atletico', '2026-07-15', 'En las villas', 2, 'Breve texto de ejemplo', 'actividad_1784133022.jfif'),
 (8, 'Carrera Deporitva', '2026-07-11', 'Avenida perimetral ', 2, 'Este es un texto para probar que funciona la reseña historica', 'actividad_1784134572.jpg');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `administrador`
---
-
-CREATE TABLE `administrador` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(40) NOT NULL,
-  `cedula` int(8) NOT NULL,
-  `telefono` varchar(20) NOT NULL,
-  `correo` varchar(255) NOT NULL,
-  `contraseña` varchar(255) NOT NULL,
-  `tipo` enum('administrador') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `administrador`
---
-
-INSERT INTO `administrador` (`id`, `nombre`, `cedula`, `telefono`, `correo`, `contraseña`, `tipo`) VALUES
-(2, 'luis', 31185743, '04269907063', 'admin123@gmail.com', '12345', 'administrador');
 
 -- --------------------------------------------------------
 
@@ -261,7 +238,7 @@ CREATE TABLE `usuarios` (
   `telefono` varchar(20) NOT NULL,
   `correo` varchar(255) NOT NULL,
   `contraseña` varchar(255) NOT NULL,
-  `tipo` enum('usuario') NOT NULL
+  `tipo` enum('administrador','usuario') NOT NULL DEFAULT 'usuario'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -269,7 +246,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nombre`, `cedula`, `telefono`, `correo`, `contraseña`, `tipo`) VALUES
-(1, 'Macarena Reina', 14693646, '04264561888', 'macarena@gmail.com', '1567882', 'usuario');
+(1, 'Macarena Reina', 14693646, '04264561888', 'macarena@gmail.com', '1567882', 'usuario'),
+(2, 'luis', 31185743, '04269907063', 'admin123@gmail.com', '12345', 'administrador');
 
 --
 -- Índices para tablas volcadas
@@ -279,12 +257,6 @@ INSERT INTO `usuarios` (`id`, `nombre`, `cedula`, `telefono`, `correo`, `contras
 -- Indices de la tabla `actividades`
 --
 ALTER TABLE `actividades`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `administrador`
---
-ALTER TABLE `administrador`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -361,12 +333,6 @@ ALTER TABLE `actividades`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT de la tabla `administrador`
---
-ALTER TABLE `administrador`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
 -- AUTO_INCREMENT de la tabla `atletas`
 --
 ALTER TABLE `atletas`
@@ -412,7 +378,7 @@ ALTER TABLE `tipos_actividad`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas

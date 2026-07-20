@@ -33,7 +33,7 @@ if (!isset($_SESSION['usuario_nombre'])) {
                     <a href="../vista/registrar_actividades.php"><i class="fas fa-calendar-alt"></i> Actividades</a>
                     <a href="../vista/ver_atletas.php"><i class="fas fa-medal"></i> Atletas</a>
                     <a href="../vista/ver_representantes.php"><i class="fas fa-users"></i> Rep. de Atletas</a>
-                    <a href="../vista/ver_entrenadores.php"><i class="fa-solid fa-whistle"></i> Entrenadores</a>
+                    <a href="../vista/ver_entrenadores.php"><i class="fas fa-stopwatch"></i> Entrenadores</a>
                     <a href="../vista/ver_autogobierno.php"><i class="fas fa-door-open"></i> Resp. Sala Autogobierno</a>
                     <a href="../vista/ver_profesores.php"><i class="fas fa-chalkboard-teacher"></i> Profesor Ed. Física</a>
                 </div>
@@ -53,9 +53,11 @@ if (!isset($_SESSION['usuario_nombre'])) {
                 </div>
             </div>
 
-            <a href="../vista/administrar_usuarios.php" class="nav-link">
-                <i class="fas fa-users-cog"></i> Usuarios
-            </a>
+            <?php if (isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'administrador'): ?>
+                <a href="../vista/administrar_usuarios.php" class="nav-link">
+                    <i class="fas fa-users-cog"></i> Usuarios
+                </a>
+            <?php endif; ?>
 
             <a href="../vista/ayuda.php" class="nav-link">
                 <i class="fas fa-question-circle"></i> Ayuda

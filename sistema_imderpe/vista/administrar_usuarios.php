@@ -60,11 +60,11 @@ include "../controlador/tabla_usuarios.php";
                                     <?php endif; ?>
                                 </td>
                                 <td class="action-cell">
-                                    <a href="editar_usuario.php?id=<?php echo $row['id']; ?>&tipo=<?php echo $row['tipo']; ?>" class="btn-table edit">
+                                    <a href="editar_usuario.php?id=<?php echo $row['id']; ?>" class="btn-table edit">
                                         <i class="fas fa-edit"></i> Editar
                                     </a>
                                     
-                                    <a href="javascript:void(0);" onclick="advertenciaEliminar(<?php echo $row['id']; ?>, '<?php echo $row['tipo']; ?>')" class="btn-table delete">
+                                    <a href="javascript:void(0);" onclick="advertenciaEliminar(<?php echo $row['id']; ?>)" class="btn-table delete">
                                         <i class="fas fa-trash-alt"></i> Eliminar
                                     </a>
                                 </td>
@@ -82,16 +82,14 @@ include "../controlador/tabla_usuarios.php";
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-
         function limpiarURL() {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
-
-        function advertenciaEliminar(id, tipo) {
+        function advertenciaEliminar(id) {
             Swal.fire({
                 title: '¿Estás seguro?',
-                text: "Esta acción eliminará permanentemente al " + tipo + " del sistema.",
+                text: "Esta acción eliminará permanentemente al usuario del sistema.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ff4d4d',
@@ -103,11 +101,26 @@ include "../controlador/tabla_usuarios.php";
                 iconColor: '#FBC02D'
             }).then((result) => {
                 if (result.isConfirmed) {
-
-                    window.location.href = "../controlador/controlador_eliminar_usuario.php?id=" + id + "&tipo=" + tipo;
+                    window.location.href = "../controlador/controlador_eliminar_usuario.php?id=" + id;
                 }
             });
         }
+
+        <?php if (isset($_GET['edit_exito'])): ?>
+            Swal.fire({
+                title: '¡Cambios Guardados!',
+                text: 'La información del usuario ha sido actualizada correctamente.',
+                icon: 'success',
+                timer: 3000,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                background: '#1D3D81',
+                color: '#ffffff',
+                iconColor: '#28a745'
+            });
+            limpiarURL();
+        <?php endif; ?>
 
         <?php if (isset($_GET['eliminar_exito'])): ?>
             Swal.fire({
@@ -125,10 +138,26 @@ include "../controlador/tabla_usuarios.php";
             limpiarURL();
         <?php endif; ?>
 
-        <?php if (isset($_GET['error_eliminar'])): ?>
+        <?php if (isset($_GET['error_duplicado'])): ?>
+            Swal.fire({
+                title: '¡Cédula Registrada!',
+                text: 'La cédula ingresada ya pertenece a otro usuario.',
+                icon: 'warning',
+                timer: 3500,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                background: '#1D3D81',
+                color: '#ffffff',
+                iconColor: '#FBC02D'
+            });
+            limpiarURL();
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
             Swal.fire({
                 title: '¡Error!',
-                text: 'Sucedió un error interno en el servidor al intentar eliminar.',
+                text: 'Sucedió un error interno en el servidor.',
                 icon: 'error',
                 timer: 3500,
                 toast: true,

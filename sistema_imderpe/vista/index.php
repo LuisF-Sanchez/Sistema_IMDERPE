@@ -14,7 +14,7 @@ session_start();
         <div class="login-box">
             <div class="logo"></div>
             
-            <h2>Acceso Administrativo</h2>
+            <h2>Acceso al Sistema</h2>
 
             <?php if (isset($_SESSION['error_login'])): ?>
                 <div style="background: rgba(211, 47, 47, 0.4); 

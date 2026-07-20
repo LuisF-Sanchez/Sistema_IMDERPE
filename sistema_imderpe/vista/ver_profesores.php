@@ -18,9 +18,9 @@ require_once '../controlador/controlador_ver_profesores.php';
 <body>
     <header class="main-header">
         <div class="header-container">
-            <a href="../vista/inicio.php" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Volver al Inicio
-            </a>
+<a href="../vista/inicio.php" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Volver al Inicio
+</a>
             <a href="registrar_profesor.php" class="btn-back">
                 <i class="fas fa-user-plus"></i> Registrar Profesor
             </a>
