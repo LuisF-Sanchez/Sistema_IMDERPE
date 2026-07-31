@@ -9,6 +9,7 @@ if (!isset($_SESSION['usuario_nombre'])) {
 }
 
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -38,6 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt_update->bind_param("sssssi", $cedula, $nombre, $apellido, $correo, $direccion, $id);
 
     if ($stmt_update->execute()) {
+        $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+        $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+        $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+        $descripcion = "El {$rol} {$nombre_user} ha actualizado los datos del representante {$nombre} {$apellido}{$cedula_txt}.";
+        registrar_bitacora($conexion, "Edición de Representante", $descripcion);
+
         $stmt_update->close();
         header("Location: ../vista/ver_representantes.php?edit_exito=ok");
         exit();
@@ -50,3 +57,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: ../vista/ver_representantes.php");
     exit();
 }
+?>

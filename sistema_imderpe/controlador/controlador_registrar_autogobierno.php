@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if (isset($_POST['btn_registrar'])) {
     
@@ -40,6 +41,12 @@ if (isset($_POST['btn_registrar'])) {
         $stmt_insert->bind_param("sssssss", $nombre, $apellido, $cedula, $telefono, $correo, $direccion, $comuna);
 
         if ($stmt_insert->execute()) {
+            $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+            $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+            $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+            $descripcion = "El {$rol} {$nombre_user} ha registrado al responsable de autogobierno {$nombre} {$apellido}{$cedula_txt}.";
+            registrar_bitacora($conexion, "Registro de Autogobierno", $descripcion);
+
             $stmt_insert->close();
             $conexion->close();
             header("Location: ../vista/ver_autogobierno.php?registro=exito");

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-07-2026 a las 06:09:36
+-- Tiempo de generación: 31-07-2026 a las 05:26:17
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -49,7 +49,8 @@ INSERT INTO `actividades` (`id`, `nombre_actividad`, `fecha`, `lugar`, `tipo_id`
 (5, 'Construcción de nueva cancha', '2026-06-13', 'Villanueva', 5, NULL, NULL),
 (6, 'actividad ejemplar', '2026-07-12', 'lugar ejemplar', 1, 'Este texto es ejemplar para probar el detalle histórico', 'actividad_1783913321.jpg'),
 (7, 'Ciclismo atletico', '2026-07-15', 'En las villas', 2, 'Breve texto de ejemplo', 'actividad_1784133022.jfif'),
-(8, 'Carrera Deporitva', '2026-07-11', 'Avenida perimetral ', 2, 'Este es un texto para probar que funciona la reseña historica', 'actividad_1784134572.jpg');
+(8, 'Carrera Deporitva', '2026-07-11', 'Avenida perimetral ', 2, 'Este es un texto para probar que funciona la reseña historica', 'actividad_1784134572.jpg'),
+(9, 'Carrera 5 km', '2026-07-23', 'La minta', 2, 'TEXTO DE EJEMPLO', 'actividad_1784830505.jfif');
 
 -- --------------------------------------------------------
 
@@ -80,7 +81,7 @@ INSERT INTO `atletas` (`id`, `cedula`, `nombre`, `apellido`, `fecha_nacimiento`,
 (1, '30123456', 'pedro', 'Reina', '2006-08-08', 'masculino', 'activo', 'infantil', '', 1, 1, 1),
 (2, '99998888', 'pochita', 'cascada', '2026-05-08', 'femenino', 'activo', 'infantil', '', 2, 1, 2),
 (3, '3423432523', 'dfsaasfasdf', 'adfdafadsfsa', '2026-05-09', 'masculino', 'activo', 'infantil', 'villa', 1, 1, 1),
-(4, '123456', 'juan', 'perez', '2026-03-10', 'masculino', 'activo', 'infantil', 'jobito', 4, 1, 1);
+(4, '123456', 'juan', 'perez', '2026-03-10', 'masculino', 'activo', 'infantil', 'jobito', 1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -130,13 +131,13 @@ CREATE TABLE `empleados` (
 --
 
 INSERT INTO `empleados` (`id`, `cedula`, `nombre`, `apellido`, `foto`, `cargo`, `telefono`, `correo`, `estado`, `fecha_ingreso`) VALUES
-(1, '1032089', 'maria', 'lopez', 'defaultavatar.png', 'Secretaria', '02513341567', 'magda300@gmail.com', 'activo', NULL),
-(2, '19203489', 'Roberto', 'Placenta', 'empleado_19203489_1783621530.jfif', 'Promotor Deportivo', '04261993043', 'Robertp@gmail.com', 'activo', NULL),
+(1, '1032089', 'maria', 'lopez', 'defaultavatar.png', 'Secretaria', '02513341567', 'magda300@gmail.com', 'inactivo', NULL),
+(2, '19203489', 'Roberto', 'Placenta', 'empleado_19203489_1785468014.avif', 'Promotor Deportivo', '04261993043', 'Robertp@gmail.com', 'activo', NULL),
 (3, '4818921', 'prueba', 'test', 'defaultavatar.png', 'Por asignar', '124144565', 'qwirfihuas@gmail.com', 'activo', NULL),
 (5, '21781408', 'ciruela', 'pollito', 'defaultavatar.png', 'Por asignar', '532414123', 'papas@gmail.com', 'activo', NULL),
 (6, '2353', 'chinchulin', 'dfwewq', 'defaultavatar.png', 'Por asignar', '13123214', 'asdasdqg@gmail.com', 'activo', NULL),
-(7, '17612823', 'Joan', 'Escalona', 'empleado_17.612.823_1783620820.jfif', 'Presidente', '04269987345', 'joanpro@gmail.com', 'activo', '2025-08-01'),
-(8, '21130372', 'keily', 'mendez', 'empleado_21130372_1783620990.jfif', 'Analista de RRHH', '0414175933', 'keily@gmail.com', 'activo', '2024-07-09'),
+(7, '17612823', 'Joan', 'Escalona', 'empleado_17612823_1785468025.png', 'Presidente', '04269987345', 'joanpro@gmail.com', 'activo', '2025-08-01'),
+(8, '21130372', 'keily', 'mendez', 'empleado_21130372_1785468035.png', 'Analista de RRHH', '0414175933', 'keily@gmail.com', 'activo', '2024-07-09'),
 (9, '324113', 'asfafa', 'asfasfasfasf', 'defaultavatar.png', 'Obrero Fijo', '1413124', 'wqiuhrfuwaq@gmail.com', 'activo', '2026-07-16');
 
 -- --------------------------------------------------------
@@ -201,7 +202,8 @@ INSERT INTO `representantes` (`id`, `cedula`, `nombre`, `apellido`, `telefono`, 
 (2, '898989898', 'alvaradok', 'monserat', '04122128830', 'alvaradox9@gmail.com', 'casa club'),
 (3, '423414', 'dsgsdgsg', 'dfhdfghds', '322523423', '', 'sfdagsagsdf'),
 (4, '323231', 'dsgsdgsfff', 'fdafdfafd', '22421324', '', 'accacacaca'),
-(5, '10182109', 'Yoswar', 'Mendez', '04264414253', '', 'Sabanita');
+(5, '10182109', 'Yoswar', 'Mendez', '04264414253', '', 'Sabanita'),
+(6, '40756891', 'lucia', 'yepez', '0426990374', '', 'casa cuna');
 
 -- --------------------------------------------------------
 
@@ -330,7 +332,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `actividades`
 --
 ALTER TABLE `actividades`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `atletas`
@@ -366,7 +368,7 @@ ALTER TABLE `entrenador_disciplina`
 -- AUTO_INCREMENT de la tabla `representantes`
 --
 ALTER TABLE `representantes`
-  MODIFY `id` int(150) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(150) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `tipos_actividad`

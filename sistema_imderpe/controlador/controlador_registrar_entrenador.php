@@ -1,5 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if (!empty($_POST["btn_registrar"])) {
 
@@ -25,6 +29,11 @@ if (!empty($_POST["btn_registrar"])) {
             $sql->bind_param("sssisss", $cedula, $nombre, $apellido, $disciplina_id, $telefono, $correo, $estado);
 
             if ($sql->execute()) {
+                $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+                $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+                $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+                $descripcion = "El {$rol} {$nombre_user} ha registrado al entrenador {$nombre} {$apellido}{$cedula_txt}.";
+                registrar_bitacora($conexion, "Registro de Entrenador", $descripcion);
 
                 header("Location: ../vista/ver_entrenadores.php?registro_exito=1");
                 exit();

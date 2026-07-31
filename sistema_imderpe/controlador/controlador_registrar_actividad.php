@@ -1,6 +1,9 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if (!empty($_POST["btn_registrar"])) {
 
@@ -47,6 +50,11 @@ if (!empty($_POST["btn_registrar"])) {
                 }
             }
             $sql_resp->close();
+
+            $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+            $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+            $descripcion = "El {$rol} {$nombre_user} ha registrado una nueva actividad '{$nombre_actividad}'.";
+            registrar_bitacora($conexion, "Registro de Actividad", $descripcion);
 
             header("Location: ../vista/inicio.php?registro_actividad_exito=1");
             exit();

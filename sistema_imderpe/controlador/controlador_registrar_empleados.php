@@ -1,6 +1,9 @@
 <?php
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once '../controlador/conexion.php';
+require_once '../controlador/registrar_bitacora.php';
 
 $cedula        = $_POST['cedula'];
 $nombre        = $_POST['nombre'];
@@ -37,6 +40,12 @@ $stmt = $conexion->prepare($sql);
 $stmt->bind_param("sssssssss", $cedula, $nombre, $apellido, $cargo, $fecha_ingreso, $telefono, $correo, $estado, $nombre_foto);
 
 if ($stmt->execute()) {
+    $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+    $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+    $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+    $descripcion = "El {$rol} {$nombre_user} ha registrado al empleado {$nombre} {$apellido}{$cedula_txt}.";
+    registrar_bitacora($conexion, "Registro de Empleado", $descripcion);
+
     header("Location: ../vista/ver_empleados.php?registro=exito");
     exit(); 
 } else {

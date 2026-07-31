@@ -1,5 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cedula = trim($_POST['cedula']);
@@ -30,6 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssssss", $nombre, $apellido, $cedula, $telefono, $correo, $instituto_educativo);
 
     if ($stmt->execute()) {
+        $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+        $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+        $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+        $descripcion = "El {$rol} {$nombre_user} ha registrado al profesor de educación física {$nombre} {$apellido}{$cedula_txt}.";
+        registrar_bitacora($conexion, "Registro de Profesor", $descripcion);
+
         $stmt->close();
         header("Location: ../vista/ver_profesores.php?registro=exito");
     } else {
@@ -40,3 +50,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: ../vista/ver_profesores.php");
 }
 $conexion->close();
+?>

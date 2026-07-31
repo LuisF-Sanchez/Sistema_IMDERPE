@@ -45,10 +45,11 @@ if (!isset($_SESSION['usuario_nombre'])) {
                     <i class="fas fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="../vista/reporte_sesiones.php"><i class="fas fa-history"></i> Reportes de Sesión</a>
+                    <?php if (isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'administrador'): ?>
+                        <a href="../vista/reporte_sesiones.php"><i class="fas fa-history"></i> Reportes de Sesión</a>
+                    <?php endif; ?>
                     <a href="../vista/reporte_actividades.php"><i class="fas fa-chart-bar"></i> Reporte de Actividades</a>
                     <div class="dropdown-divider"></div>
-                    <a href="../vista/constancia_trabajo.php"><i class="fas fa-file-signature"></i> Constancia de Trabajo</a>
                     <a href="../vista/constancia_participacion.php"><i class="fas fa-certificate"></i> Constancia de Participación</a>
                 </div>
             </div>

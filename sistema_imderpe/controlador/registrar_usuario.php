@@ -1,5 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre     = trim($_POST['nombre']);
@@ -30,6 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssssss", $nombre, $cedula, $telefono, $correo, $contraseña, $tipo);
 
     if ($stmt->execute()) {
+        $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+        $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+        $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+        $descripcion = "El {$rol} {$nombre_user} ha registrado un nuevo usuario del sistema: {$nombre}{$cedula_txt} (Rol: {$tipo}).";
+        registrar_bitacora($conexion, "Registro de Usuario", $descripcion);
+
         $stmt->close();
         header("Location: ../vista/administrar_usuarios.php?success=true");
         exit();

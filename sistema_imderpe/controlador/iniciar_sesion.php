@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'conexion.php'; 
+require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -19,6 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['usuario_cedula'] = $usuario['cedula']; 
             $_SESSION['usuario_nombre'] = $usuario['nombre']; 
             $_SESSION['usuario_tipo']   = $usuario['tipo']; 
+
+            // Registrar inicio de sesión en la bitácora
+            $rol = ucfirst($_SESSION['usuario_tipo']);
+            $nombre = $_SESSION['usuario_nombre'];
+            $descripcion = "El {$rol} {$nombre} ha iniciado sesión en el sistema.";
+            registrar_bitacora($conexion, "Inicio de Sesión", $descripcion);
 
             header("Location: ../vista/inicio.php");
             exit();

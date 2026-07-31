@@ -1,5 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once '../controlador/conexion.php';
+require_once '../controlador/registrar_bitacora.php';
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']); 
@@ -46,6 +50,12 @@ if (!empty($_POST["btn_actualizar"])) {
         WHERE id = $id");
 
     if ($sql) {
+        $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+        $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+        $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+        $descripcion = "El {$rol} {$nombre_user} ha actualizado los datos del atleta {$nombre} {$apellido}{$cedula_txt}.";
+        registrar_bitacora($conexion, "Edición de Atleta", $descripcion);
+
         header("Location: ../vista/ver_atletas.php?edit_exito=1");
         exit();
     } else {

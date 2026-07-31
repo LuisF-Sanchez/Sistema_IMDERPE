@@ -10,12 +10,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Elimina cualquier tipo de scroll en la pantalla */
+    overflow: hidden; 
 }
 
 .login-container {
     width: 100%;
-    max-width: 720px; /* Ancho idéntico al registro para el soporte de 2 columnas */
+    max-width: 720px; 
     padding: 15px;
 }
 
@@ -31,8 +31,12 @@ body {
 }
 
 .logo-form {
-    width: 85px;
+    width: 128px; 
+    height: auto; 
     margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .form-title {
@@ -43,7 +47,6 @@ body {
     font-size: 1.35rem;
 }
 
-/* Distribución simétrica en dos columnas */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -95,7 +98,6 @@ body {
     color: white;
 }
 
-/* Área integrada para la foto */
 .file-group {
     grid-column: span 2;
     margin-top: 14px;

@@ -12,6 +12,9 @@ session_start();
 <body>
     <div class="login-container">
         <div class="login-box">
+            
+            <h1 class="sistema-titulo">SISGAPDIM</h1>
+
             <div class="logo"></div>
             
             <h2>Acceso al Sistema</h2>

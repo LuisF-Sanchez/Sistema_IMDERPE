@@ -1,5 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if (!empty($_POST["btn_editar"])) {
 
@@ -25,6 +29,11 @@ if (!empty($_POST["btn_editar"])) {
         $sql->bind_param("sssisssi", $cedula, $nombre, $apellido, $disciplina_id, $telefono, $correo, $estado, $id);
 
         if ($sql->execute()) {
+            $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+            $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+            $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+            $descripcion = "El {$rol} {$nombre_user} ha actualizado los datos del entrenador {$nombre} {$apellido}{$cedula_txt}.";
+            registrar_bitacora($conexion, "Edición de Entrenador", $descripcion);
 
             header("Location: ../vista/ver_entrenadores.php?edit_exito=1");
             exit();

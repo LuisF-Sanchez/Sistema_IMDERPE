@@ -1,5 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = intval($_POST['id']);
@@ -31,6 +35,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssssssi", $nombre, $apellido, $cedula, $telefono, $correo, $instituto_educativo, $id);
 
     if ($stmt->execute()) {
+        $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+        $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+        $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+        $descripcion = "El {$rol} {$nombre_user} ha actualizado los datos del profesor de educación física {$nombre} {$apellido}{$cedula_txt}.";
+        registrar_bitacora($conexion, "Edición de Profesor", $descripcion);
+
         $stmt->close();
         header("Location: ../vista/ver_profesores.php?edit_exito=1");
     } else {
@@ -57,3 +67,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 }
+?>

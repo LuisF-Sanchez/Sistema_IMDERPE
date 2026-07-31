@@ -1,5 +1,14 @@
 <?php
 session_start();
+require_once 'conexion.php';
+require_once 'registrar_bitacora.php';
+
+if (isset($_SESSION['usuario_nombre'])) {
+    $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
+    $nombre = $_SESSION['usuario_nombre'];
+    $descripcion = "El {$rol} {$nombre} ha cerrado sesión en el sistema.";
+    registrar_bitacora($conexion, "Cierre de Sesión", $descripcion);
+}
 
 $_SESSION = array();
 
