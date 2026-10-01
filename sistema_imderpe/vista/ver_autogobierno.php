@@ -31,7 +31,7 @@ require_once '../controlador/controlador_autogobierno.php';
         <h1 class="main-title">Gestión de Autogobierno</h1>
         
         <div class="glass-table-container">
-            <?php if (isset($resultado) && $resultado->num_rows > 0): ?>
+            <?php if (isset($resultado) && $resultado && $resultado->num_rows > 0): ?>
                 <table class="user-table">
                     <thead>
                         <tr>
@@ -169,5 +169,7 @@ require_once '../controlador/controlador_autogobierno.php';
 </body>
 </html>
 <?php 
-$conexion->close(); 
+if (isset($conexion) && $conexion instanceof mysqli) {
+    $conexion->close();
+}
 ?>

@@ -51,17 +51,21 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px 20px;
+    align-items: start; 
 }
 
 .input-group {
     position: relative;
     margin-bottom: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .input-group i {
     position: absolute;
     left: 15px;
-    top: 50%;
+    top: 20px; 
     transform: translateY(-50%);
     color: rgba(255, 255, 255, 0.8);
     z-index: 2;
@@ -77,6 +81,24 @@ body {
     outline: none;
     box-sizing: border-box;
     font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+
+.input-group input.input-error, .input-group select.input-error {
+    border-color: #ff4d4d !important;
+    background: rgba(255, 77, 77, 0.15) !important;
+}
+
+
+.error-mensaje {
+    color: #ff6b6b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 4px;
+    margin-left: 5px;
+    text-align: left;
+    display: block;
 }
 
 .input-group input[type="date"]::-webkit-calendar-picker-indicator {

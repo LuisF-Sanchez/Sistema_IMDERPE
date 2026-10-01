@@ -6,13 +6,13 @@ if (!isset($_SESSION['usuario_nombre'])) {
 }
 require_once '../controlador/conexion.php';
 
-$res_empleados = $conexion->query("SELECT id, nombre, apellido, cargo FROM empleados WHERE estado = 'activo' ORDER BY nombre ASC");
-$res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER BY nombre_tipo ASC");
+$res_empleados =$conexion->query("SELECT id, nombre, apellido, cargo FROM empleados WHERE estado = 'activo' ORDER BY nombre ASC");
+$res_tipos =$conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER BY nombre_tipo ASC");
 
 $empleados_array = [];
-if ($res_empleados && $res_empleados->num_rows > 0) {
-    while($e = $res_empleados->fetch_assoc()) {
-        $empleados_array[] = $e;
+if ($res_empleados &&$res_empleados->num_rows > 0) {
+    while($e =$res_empleados->fetch_assoc()) {
+        $empleados_array[] =$e;
     }
 }
 ?>
@@ -28,35 +28,36 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
 </head>
 <body>
     <div class="login-container">
-        <form action="../controlador/controlador_registrar_actividad.php" method="POST" enctype="multipart/form-data" class="glass-form">
-            <div class="logo-container">
-                <img src="../estilo/logo.png" alt="Logo IMDERPE" class="logo-form">
-            </div>
+        <form id="form-actividad" action="../controlador/controlador_registrar_actividad.php" method="POST" enctype="multipart/form-data" class="glass-form" novalidate>
             <h2 class="form-title">Registro de Actividad</h2>
 
             <div class="form-grid">
                 
+                <!-- Nombre de la Actividad -->
                 <div class="input-group">
                     <i class="fas fa-running"></i>
-                    <input type="text" name="nombre_actividad" placeholder="Nombre de la Actividad" required>
+                    <input type="text" id="nombre_actividad" name="nombre_actividad" placeholder="Nombre de la Actividad">
                 </div>
 
+                <!-- Fecha -->
                 <div class="input-group">
                     <i class="fas fa-calendar-alt"></i>
-                    <input type="date" name="fecha" required>
+                    <input type="date" id="fecha" name="fecha">
                 </div>
 
+                <!-- Lugar -->
                 <div class="input-group">
                     <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" name="lugar" placeholder="Lugar o Instalación" required>
+                    <input type="text" id="lugar" name="lugar" placeholder="Lugar o Instalación">
                 </div>
 
+                <!-- Tipo de Actividad -->
                 <div class="input-group">
                     <i class="fas fa-layer-group"></i>
-                    <select name="tipo_id" id="tipo_id" required>
+                    <select name="tipo_id" id="tipo_id">
                         <option value="" disabled selected>Seleccione Tipo de Actividad</option>
-                        <?php if($res_tipos && $res_tipos->num_rows > 0): ?>
-                            <?php foreach($res_tipos as $t): ?>
+                        <?php if($res_tipos &&$res_tipos->num_rows > 0): ?>
+                            <?php foreach($res_tipos as$t): ?>
                                 <option value="<?php echo $t['id']; ?>">
                                     <?php echo htmlspecialchars($t['nombre_tipo']); ?>
                                 </option>
@@ -68,20 +69,22 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
                     </select>
                 </div>
 
+                <!-- Reseña -->
                 <div class="input-group full-width">
                     <i class="fas fa-book-open" style="top: 22px;"></i>
-                    <textarea name="resena" placeholder="Escriba una breve reseña histórica de la actividad..." rows="3"></textarea>
+                    <textarea id="resena" name="resena" placeholder="Escriba una breve reseña histórica de la actividad..." rows="3"></textarea>
                 </div>
 
+                <!-- Responsables -->
                 <div class="responsables-section full-width">
                     <label class="section-label"><i class="fas fa-users"></i> Asignación de Responsables</label>
                     <div id="contenedor-responsables">
                         <div class="responsable-row">
                             <div class="input-group field-dinamico">
                                 <i class="fas fa-user-shield"></i>
-                                <select name="empleado_id[]" required disabled class="select-responsable">
+                                <select name="empleado_id[]" disabled class="select-responsable">
                                     <option value="" disabled selected>Primero seleccione una actividad...</option>
-                                    <?php foreach($empleados_array as $e): ?>
+                                    <?php foreach($empleados_array as$e): ?>
                                         <option value="<?php echo $e['id']; ?>">
                                             <?php echo htmlspecialchars($e['nombre'] . " " . $e['apellido'] . " - " . $e['cargo']); ?>
                                         </option>
@@ -95,6 +98,7 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
                     </div>
                 </div>
 
+                <!-- Foto Multimedia -->
                 <div class="multimedia-section full-width">
                     <div class="file-group">
                         <label class="file-label" for="foto_actividad">
@@ -118,10 +122,49 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
 
     <script>
         const listaEmpleados = <?php echo json_encode($empleados_array); ?>;
+        const formActividad = document.getElementById('form-actividad');
         const tipoActividadSelect = document.getElementById('tipo_id');
         const btnAddResponsable = document.getElementById('btn-add-responsable');
         const contenedorResponsables = document.getElementById('contenedor-responsables');
 
+        // Ocultar mensajes de error cuando el usuario modifique la casilla
+        function ocultarErroresGrupo(parentGroup) {
+            parentGroup.querySelectorAll('.error-mensaje').forEach(el => el.remove());
+            const input = parentGroup.querySelector('input, select, textarea');
+            if (input) input.classList.remove('input-error');
+        }
+
+        // Asignar escuchadores de limpieza a elementos dinámicos o estáticos
+        document.addEventListener('input', function(e) {
+            const parent = e.target.closest('.input-group');
+            if (parent) ocultarErroresGrupo(parent);
+        });
+
+        document.addEventListener('change', function(e) {
+            const parent = e.target.closest('.input-group');
+            if (parent) ocultarErroresGrupo(parent);
+        });
+
+        // Inhabilitar en los demás select los responsables ya elegidos
+        function actualizarOpcionesResponsables() {
+            const selects = document.querySelectorAll('.select-responsable');
+            const seleccionados = Array.from(selects)
+                .map(s => s.value)
+                .filter(val => val !== "" && val !== null);
+
+            selects.forEach(select => {
+                const valorActual = select.value;
+                Array.from(select.options).forEach(option => {
+                    if (option.value === "" || option.value === valorActual) {
+                        option.disabled = false;
+                    } else {
+                        option.disabled = seleccionados.includes(option.value);
+                    }
+                });
+            });
+        }
+
+        // Habilitar / Deshabilitar selectores de responsables al cambiar el Tipo de Actividad
         tipoActividadSelect.addEventListener('change', function() {
             const selects = document.querySelectorAll('.select-responsable');
             if (this.value !== "") {
@@ -138,15 +181,17 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
                     <div class="responsable-row">
                         <div class="input-group field-dinamico">
                             <i class="fas fa-user-shield"></i>
-                            <select name="empleado_id[]" required disabled class="select-responsable">
+                            <select name="empleado_id[]" disabled class="select-responsable">
                                 <option value="" disabled selected>Primero seleccione una actividad...</option>
                             </select>
                         </div>
                         <button type="button" class="btn-dinamico add" id="btn-add-responsable" disabled><i class="fas fa-plus"></i></button>
                     </div>`;
             }
+            actualizarOpcionesResponsables();
         });
 
+        // Manejo dinámico de filas de responsables
         contenedorResponsables.addEventListener('click', function(e) {
             if (e.target.closest('#btn-add-responsable')) {
                 const nuevaFila = document.createElement('div');
@@ -160,7 +205,7 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
                 nuevaFila.innerHTML = `
                     <div class="input-group field-dinamico">
                         <i class="fas fa-user-shield"></i>
-                        <select name="empleado_id[]" required class="select-responsable">
+                        <select name="empleado_id[]" class="select-responsable">
                             ${opciones}
                         </select>
                     </div>
@@ -169,14 +214,23 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
                     </button>
                 `;
                 contenedorResponsables.appendChild(nuevaFila);
+                actualizarOpcionesResponsables();
             }
 
             if (e.target.closest('.btn-dinamico.remove')) {
                 const fila = e.target.closest('.responsable-row');
                 fila.remove();
+                actualizarOpcionesResponsables();
             }
         });
 
+        contenedorResponsables.addEventListener('change', function(e) {
+            if (e.target.classList.contains('select-responsable')) {
+                actualizarOpcionesResponsables();
+            }
+        });
+
+        // Previsualización de la imagen
         document.getElementById('foto_actividad').addEventListener('change', function(e) {
             const previewBox = document.getElementById('preview-box');
             const imgPreview = document.getElementById('img-preview');
@@ -191,6 +245,68 @@ if ($res_empleados && $res_empleados->num_rows > 0) {
                 reader.readAsDataURL(file);
             } else {
                 previewBox.style.display = 'none';
+            }
+        });
+
+        // Función para mostrar el mensaje de error con asterisco
+        function mostrarErrorCampo(campo, mensaje) {
+            campo.classList.add('input-error');
+            const parentGroup = campo.closest('.input-group');
+            
+            if (parentGroup && !parentGroup.querySelector('.error-mensaje')) {
+                const msgError = document.createElement('span');
+                msgError.className = 'error-mensaje';
+                msgError.innerHTML = mensaje;
+                parentGroup.appendChild(msgError);
+            }
+        }
+
+        // Validaciones en JS al presionar Submit
+        formActividad.addEventListener('submit', function(e) {
+            // Limpiar errores previos
+            formActividad.querySelectorAll('.error-mensaje').forEach(el => el.remove());
+            formActividad.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+
+            let hayError = false;
+
+            // 1. Validar Nombre
+            const nombre = document.getElementById('nombre_actividad');
+            if (!nombre.value || nombre.value.trim() === "") {
+                hayError = true;
+                mostrarErrorCampo(nombre, "* Debe colocar el nombre de la actividad");
+            }
+
+            // 2. Validar Fecha
+            const fecha = document.getElementById('fecha');
+            if (!fecha.value || fecha.value.trim() === "") {
+                hayError = true;
+                mostrarErrorCampo(fecha, "* Debe seleccionar la fecha");
+            }
+
+            // 3. Validar Lugar
+            const lugar = document.getElementById('lugar');
+            if (!lugar.value || lugar.value.trim() === "") {
+                hayError = true;
+                mostrarErrorCampo(lugar, "* Debe colocar el lugar o instalación");
+            }
+
+            // 4. Validar Tipo de Actividad
+            if (!tipoActividadSelect.value || tipoActividadSelect.value === "") {
+                hayError = true;
+                mostrarErrorCampo(tipoActividadSelect, "* Debe seleccionar el tipo de actividad");
+            }
+
+            // 5. Validar Responsables seleccionados
+            const selectsResponsables = document.querySelectorAll('.select-responsable');
+            selectsResponsables.forEach(select => {
+                if (!select.disabled && (!select.value || select.value === "")) {
+                    hayError = true;
+                    mostrarErrorCampo(select, "* Debe seleccionar un responsable");
+                }
+            });
+
+            if (hayError) {
+                e.preventDefault();
             }
         });
     </script>

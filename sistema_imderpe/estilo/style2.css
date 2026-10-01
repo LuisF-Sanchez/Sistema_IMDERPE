@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-image: url('../estilo/background_cancha.jpg'); 
+    background-image: url('../estilo/bgimderpe.jpg'); 
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -176,6 +176,13 @@ body {
     margin: 0;
 }
 
-.dropbtn i.fa-eye, .dropbtn i.fa-file-pdf {
-    color: #FBC02D; 
+.dropbtn i.fa-eye, 
+.dropbtn i.fa-file-pdf {
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.dropdown:hover .dropbtn i.fa-eye,
+.dropdown:hover .dropbtn i.fa-file-pdf {
+    color: #FBC02D;
 }

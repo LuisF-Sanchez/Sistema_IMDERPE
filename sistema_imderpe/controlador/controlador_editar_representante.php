@@ -17,26 +17,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cedula = trim($_POST['cedula']);
     $nombre = trim($_POST['nombre']);
     $apellido = trim($_POST['apellido']);
+    $telefono = trim($_POST['telefono']);
     $correo = trim($_POST['correo']);
     $direccion = trim($_POST['direccion']);
 
-    $check_sql = "SELECT id FROM representantes WHERE (cedula = ? OR correo = ?) AND id <> ?";
-    $stmt_check = $conexion->prepare($check_sql);
-    $stmt_check->bind_param("ssi", $cedula, $correo, $id);
-    $stmt_check->execute();
-    $res_check = $stmt_check->get_result();
-
-    if ($res_check->num_rows > 0) {
-        $stmt_check->close();
-        header("Location: ../vista/ver_representantes.php?error_duplicado=ok");
+    // 1. Validar CÉDULA duplicada
+    $check_cedula = $conexion->prepare("SELECT id FROM representantes WHERE cedula = ? AND id <> ?");
+    $check_cedula->bind_param("si", $cedula, $id);
+    $check_cedula->execute();
+    if ($check_cedula->get_result()->num_rows > 0) {
+        $check_cedula->close();
+        header("Location: ../vista/editar_representante.php?id={$id}&error=duplicado&campo=cedula");
         exit();
     }
-    $stmt_check->close();
+    $check_cedula->close();
 
-    $update_sql = "UPDATE representantes SET cedula = ?, nombre = ?, apellido = ?, correo = ?, direccion = ? WHERE id = ?";
+    // 2. Validar TELÉFONO duplicado
+    if (!empty($telefono)) {
+        $check_telefono = $conexion->prepare("SELECT id FROM representantes WHERE telefono = ? AND id <> ?");
+        $check_telefono->bind_param("si", $telefono, $id);
+        $check_telefono->execute();
+        if ($check_telefono->get_result()->num_rows > 0) {
+            $check_telefono->close();
+            header("Location: ../vista/editar_representante.php?id={$id}&error=duplicado&campo=telefono");
+            exit();
+        }
+        $check_telefono->close();
+    }
+
+    // 3. Validar CORREO duplicado
+    if (!empty($correo)) {
+        $check_correo = $conexion->prepare("SELECT id FROM representantes WHERE correo = ? AND id <> ?");
+        $check_correo->bind_param("si", $correo, $id);
+        $check_correo->execute();
+        if ($check_correo->get_result()->num_rows > 0) {
+            $check_correo->close();
+            header("Location: ../vista/editar_representante.php?id={$id}&error=duplicado&campo=correo");
+            exit();
+        }
+        $check_correo->close();
+    }
+
+    // Actualizar datos del representante
+    $update_sql = "UPDATE representantes SET cedula = ?, nombre = ?, apellido = ?, telefono = ?, correo = ?, direccion = ? WHERE id = ?";
     $stmt_update = $conexion->prepare($update_sql);
-    
-    $stmt_update->bind_param("sssssi", $cedula, $nombre, $apellido, $correo, $direccion, $id);
+    $stmt_update->bind_param("ssssssi", $cedula, $nombre, $apellido, $telefono, $correo, $direccion, $id);
 
     if ($stmt_update->execute()) {
         $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');

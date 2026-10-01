@@ -117,16 +117,18 @@ body {
     background-color: rgba(255, 255, 255, 0.08);
 }
 
-.col-cedula { width: 8%; }
-.col-atleta { width: 12%; }
-.col-genero { width: 7%; }
-.col-nacimiento { width: 8%; }
-.col-representante { width: 12%; }
-.col-entrenador { width: 12%; }
-.col-comuna { width: 8%; }
-.col-categoria { width: 8%; }
-.col-disciplina { width: 8%; }
-.col-estado { width: 17%; } 
+.col-cedula { width: 7%; }
+.col-nombre { width: 8%; }
+.col-apellido { width: 8%; }
+.col-genero { width: 6%; }
+.col-nacimiento { width: 7%; }
+.col-representante { width: 11%; }
+.col-entrenador { width: 11%; }
+.col-comuna { width: 7%; }
+.col-categoria { width: 7%; }
+.col-disciplina { width: 7%; }
+.col-estado { width: 6%; } 
+.col-acciones { width: 15%; }
 
 .action-cell {
     display: flex;

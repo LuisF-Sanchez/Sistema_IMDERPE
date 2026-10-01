@@ -32,7 +32,6 @@ require_once '../controlador/controlador_entrenadores.php';
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Cédula</th>
                             <th>Entrenador</th>
                             <th>Especialidad</th>
@@ -45,7 +44,6 @@ require_once '../controlador/controlador_entrenadores.php';
                     <tbody>
                         <?php while($row = $resultado->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
                                 <td><?php echo htmlspecialchars($row['cedula']); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre'] . " " . $row['apellido']); ?></td>
                                 <td>

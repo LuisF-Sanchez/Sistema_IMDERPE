@@ -1,44 +1,83 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 require_once 'conexion.php';
 require_once 'registrar_bitacora.php';
 
-$response = ['success' => false, 'id' => null, 'nombre' => '', 'cedula' => ''];
+header('Content-Type: application/json');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $cedula = $_POST['cedula'];
-    $nombre = $_POST['nombre'];
-    $apellido = $_POST['apellido'];
-    $telefono = $_POST['telefono'];
-    $direccion = $_POST['direccion'];
+$cedula = trim($_POST['cedula'] ?? '');
+$nombre = trim($_POST['nombre'] ?? '');
+$apellido = trim($_POST['apellido'] ?? '');
+$telefono = trim($_POST['telefono'] ?? '');
+$correo = trim($_POST['correo'] ?? '');
+$direccion = trim($_POST['direccion'] ?? '');
 
-    $sql = "INSERT INTO representantes (cedula, nombre, apellido, telefono, direccion) 
-            VALUES (?, ?, ?, ?, ?)";
-    
-    $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("sssss", $cedula, $nombre, $apellido, $telefono, $direccion);
+$errores = [];
 
-    if ($stmt->execute()) {
-        $nuevo_id = $conexion->insert_id;
-        
-        $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario');
-        $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
-        $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
-        $descripcion = "El {$rol} {$nombre_user} ha registrado al representante {$nombre} {$apellido}{$cedula_txt}.";
-        registrar_bitacora($conexion, "Registro de Representante", $descripcion);
-
-        $response['success'] = true;
-        $response['id'] = $nuevo_id;
-        $response['nombre'] = $nombre . " " . $apellido;
-        $response['cedula'] = $cedula;
+// 1. Validar si la CÉDULA ya existe
+if (!empty($cedula)) {
+    $stmt = $conexion->prepare("SELECT id FROM representantes WHERE cedula = ?");
+    $stmt->bind_param("s", $cedula);
+    $stmt->execute();
+    if ($stmt->get_result()->num_rows > 0) {
+        $errores['cedula'] = "Esta cédula ya está registrada";
     }
-    
     $stmt->close();
 }
 
-header('Content-Type: application/json');
-echo json_encode($response);
-$conexion->close();
+// 2. Validar si el TELÉFONO ya existe
+if (!empty($telefono)) {
+    $stmt = $conexion->prepare("SELECT id FROM representantes WHERE telefono = ?");
+    $stmt->bind_param("s", $telefono);
+    $stmt->execute();
+    if ($stmt->get_result()->num_rows > 0) {
+        $errores['telefono'] = "El número de teléfono ya está registrado";
+    }
+    $stmt->close();
+}
+
+// 3. Validar si el CORREO ya existe
+if (!empty($correo)) {
+    $stmt = $conexion->prepare("SELECT id FROM representantes WHERE correo = ?");
+    $stmt->bind_param("s", $correo);
+    $stmt->execute();
+    if ($stmt->get_result()->num_rows > 0) {
+        $errores['correo'] = "El correo ya está registrado";
+    }
+    $stmt->close();
+}
+
+// Si hay uno o más errores, se devuelven todos al mismo tiempo
+if (!empty($errores)) {
+    echo json_encode(['success' => false, 'errors' => $errores]);
+    exit();
+}
+
+// 4. Inserción de nuevo representante
+$stmt_insert = $conexion->prepare("INSERT INTO representantes (cedula, nombre, apellido, telefono, correo, direccion) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt_insert->bind_param("ssssss", $cedula, $nombre, $apellido, $telefono, $correo, $direccion);
+
+if ($stmt_insert->execute()) {
+    $nuevo_id = $stmt_insert->insert_id;
+
+    // Registrar en la bitácora
+    $id_usuario = $_SESSION['usuario_id'] ?? null;
+    $accion = "REGISTRO_REPRESENTANTE_RAPIDO";
+    $descripcion = "Se registró rápidamente al representante '{$nombre} {$apellido}' (Cédula: {$cedula})";
+
+    if (function_exists('registrar_bitacora')) {
+        registrar_bitacora($conexion, $id_usuario, $accion, $descripcion);
+    }
+
+    echo json_encode([
+        'success' => true,
+        'id'      => $nuevo_id,
+        'cedula'  => $cedula,
+        'nombre'  => $nombre . " " . $apellido
+    ]);
+} else {
+    echo json_encode(['success' => false, 'error' => 'Error al guardar en la base de datos.']);
+}
+
+$stmt_insert->close();
 ?>

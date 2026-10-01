@@ -18,9 +18,9 @@ require_once '../controlador/controlador_ver_representantes.php';
 <body>
     <header class="main-header">
         <div class="header-container">
-<a href="../vista/inicio.php" class="btn-back">
-    <i class="fas fa-arrow-left"></i> Volver al Inicio
-</a>
+            <a href="../vista/inicio.php" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Volver al Inicio
+            </a>
         </div>
     </header>
 
@@ -32,10 +32,10 @@ require_once '../controlador/controlador_ver_representantes.php';
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Cédula</th>
                             <th>Nombre</th>
                             <th>Apellido</th>
+                            <th>Teléfono</th>
                             <th>Correo</th>
                             <th>Dirección</th>
                             <th style="text-align: center;">Acciones</th>
@@ -44,10 +44,10 @@ require_once '../controlador/controlador_ver_representantes.php';
                     <tbody>
                         <?php while($row = $resultado->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
                                 <td><?php echo htmlspecialchars($row['cedula']); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre']); ?></td>
                                 <td><?php echo htmlspecialchars($row['apellido']); ?></td>
+                                <td><?php echo htmlspecialchars($row['telefono'] ?? ''); ?></td>
                                 <td><?php echo htmlspecialchars($row['correo']); ?></td>
                                 <td><?php echo htmlspecialchars($row['direccion']); ?></td>
                                 <td class="action-cell">
@@ -103,22 +103,6 @@ require_once '../controlador/controlador_ver_representantes.php';
                 background: '#1D3D81',
                 color: '#ffffff',
                 iconColor: '#4db8ff'
-            });
-            limpiarURL();
-        <?php endif; ?>
-
-        <?php if (isset($_GET['error_duplicado'])): ?>
-            Swal.fire({
-                title: '¡Representante ya existe!',
-                text: 'La cédula o el correo ingresados ya pertenecen a un representante registrado.',
-                icon: 'warning',
-                timer: 3500,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                background: '#1D3D81',
-                color: '#ffffff',
-                iconColor: '#FBC02D'
             });
             limpiarURL();
         <?php endif; ?>

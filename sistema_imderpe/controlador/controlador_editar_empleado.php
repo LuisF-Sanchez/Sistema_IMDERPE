@@ -7,22 +7,41 @@ require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id            = intval($_POST['id']);
-    $cedula        = $_POST['cedula'];
-    $nombre        = $_POST['nombre'];
-    $apellido      = $_POST['apellido'];
-    $cargo         = $_POST['cargo'];
-    $telefono      = $_POST['telefono'];
-    $correo        = $_POST['correo'];
-    $estado        = $_POST['estado'];
+    $cedula        = trim($_POST['cedula']);
+    $nombre        = trim($_POST['nombre']);
+    $apellido      = trim($_POST['apellido']);
+    $cargo         = trim($_POST['cargo']);
+    $telefono      = trim($_POST['telefono']);
+    $correo        = trim($_POST['correo']);
+    $estado        = trim($_POST['estado']);
     $fecha_ingreso = !empty($_POST['fecha_ingreso']) ? $_POST['fecha_ingreso'] : null;
 
-    $check = $conexion->prepare("SELECT id FROM empleados WHERE (cedula = ? OR correo = ?) AND id != ?");
-    $check->bind_param("ssi", $cedula, $correo, $id);
+    $check = $conexion->prepare("SELECT id FROM empleados WHERE cedula = ? AND id != ?");
+    $check->bind_param("si", $cedula, $id);
     $check->execute();
-    $res = $check->get_result();
+    if ($check->get_result()->num_rows > 0) {
+        $check->close();
+        header("Location: ../vista/editar_empleado.php?id={$id}&error=duplicado&campo=cedula");
+        exit();
+    }
+    $check->close();
 
-    if ($res->num_rows > 0) {
-        header("Location: ../vista/ver_empleados.php?error_duplicado=true");
+    $check = $conexion->prepare("SELECT id FROM empleados WHERE telefono = ? AND id != ?");
+    $check->bind_param("si", $telefono, $id);
+    $check->execute();
+    if ($check->get_result()->num_rows > 0) {
+        $check->close();
+        header("Location: ../vista/editar_empleado.php?id={$id}&error=duplicado&campo=telefono");
+        exit();
+    }
+    $check->close();
+
+    $check = $conexion->prepare("SELECT id FROM empleados WHERE correo = ? AND id != ?");
+    $check->bind_param("si", $correo, $id);
+    $check->execute();
+    if ($check->get_result()->num_rows > 0) {
+        $check->close();
+        header("Location: ../vista/editar_empleado.php?id={$id}&error=duplicado&campo=correo");
         exit();
     }
     $check->close();

@@ -75,7 +75,8 @@ $categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
                     <thead>
                         <tr>
                             <th class="col-cedula">Cédula</th>
-                            <th class="col-atleta">Atleta</th>
+                            <th class="col-nombre">Nombre</th>
+                            <th class="col-apellido">Apellido</th>
                             <th class="col-genero">Género</th>
                             <th class="col-nacimiento">Nacimiento</th>
                             <th class="col-representante">Representante</th>
@@ -83,14 +84,16 @@ $categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
                             <th class="col-comuna">Comuna</th>
                             <th class="col-categoria">Categoría</th>
                             <th class="col-disciplina">Disciplina</th>
-                            <th class="col-estado" style="text-align: center;">Estado / Acciones</th>
+                            <th class="col-estado" style="text-align: center;">Estado</th>
+                            <th class="col-acciones" style="text-align: center;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php while($row = $resultado->fetch_assoc()): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($row['cedula']); ?></td>
-                                <td><?php echo htmlspecialchars($row['nombre'] . " " . $row['apellido']); ?></td>
+                                <td><?php echo htmlspecialchars($row['nombre']); ?></td>
+                                <td><?php echo htmlspecialchars($row['apellido']); ?></td>
                                 <td><?php echo htmlspecialchars($row['genero']); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($row['fecha_nacimiento'])); ?></td>
                                 <td><?php echo htmlspecialchars($row['nombre_rep'] . " " . $row['apellido_rep']); ?></td>
@@ -98,21 +101,22 @@ $categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
                                 <td><?php echo htmlspecialchars($row['comuna']); ?></td>
                                 <td style="text-transform: capitalize; font-weight: 500; color: #FBC02D;"><?php echo htmlspecialchars($row['categoria']); ?></td>
                                 <td><span class="badge-disciplina"><?php echo htmlspecialchars($row['disciplina']); ?></span></td>
-                                <td class="action-cell">
+                                <td style="text-align: center;">
                                     <?php $clase = ($row['estado'] == 'activo') ? 'estado-activo' : 'estado-inactivo'; ?>
-                                    <span class="badge-estado <?php echo $clase; ?>" style="margin-right: 5px;"><?php echo ucfirst($row['estado']); ?></span>
-
+                                    <span class="badge-estado <?php echo $clase; ?>"><?php echo ucfirst($row['estado']); ?></span>
+                                </td>
+                                <td class="action-cell">
                                     <a href="editar_atleta.php?id=<?php echo $row['id']; ?>" class="btn-table edit" title="Editar Atleta">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-edit"></i> Editar
                                     </a>
                                     
                                     <?php if ($row['estado'] == 'activo'): ?>
                                         <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=activo" class="btn-inactivar" title="Inactivar">
-                                            <i class="fas fa-user-slash"></i>
+                                            <i class="fas fa-user-slash"></i> Inactivar
                                         </a>
                                     <?php else: ?>
                                         <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=inactivo" class="btn-activar" title="Activar">
-                                            <i class="fas fa-user-check"></i>
+                                            <i class="fas fa-user-check"></i> Activar
                                         </a>
                                     <?php endif; ?>
                                 </td>

@@ -106,3 +106,15 @@ select option {
     background-color: #1D3D81;
     color: #ffffff; 
 }
+
+.input-error {
+    border-color: #ff5252 !important;
+    background: rgba(255, 82, 82, 0.1) !important;
+}
+
+.error-mensaje {
+    color: #ff5252;
+    font-size: 0.82rem;
+    font-weight: bold;
+    margin-top: 4px;
+}

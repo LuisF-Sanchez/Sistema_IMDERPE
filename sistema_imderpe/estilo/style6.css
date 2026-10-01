@@ -56,12 +56,13 @@ body {
 .input-group {
     position: relative;
     margin-bottom: 0px; 
+    text-align: left; /* Alinea los mensajes de error a la izquierda */
 }
 
 .input-group i {
     position: absolute;
     left: 15px;
-    top: 50%;
+    top: 20px; /* Centrado vertical con respecto al campo de entrada */
     transform: translateY(-50%);
     color: rgba(255, 255, 255, 0.8);
     z-index: 2; 
@@ -77,7 +78,25 @@ body {
     outline: none;
     box-sizing: border-box;
     font-size: 0.9rem;
-    transition: background-color 5000s ease-in-out 0s;
+    transition: background-color 5000s ease-in-out 0s, border-color 0.3s ease;
+}
+
+/* Estilo para los campos cuando hay un error */
+.input-group input.input-error, 
+.input-group select.input-error {
+    border: 1.5px solid #ff4d4d !important;
+    background: rgba(255, 77, 77, 0.1) !important;
+}
+
+/* Mensaje de error debajo del campo */
+.error-mensaje {
+    display: block;
+    color: #ff6b6b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 3px;
+    margin-left: 5px;
+    text-align: left;
 }
 
 .input-group input[type="date"]::-webkit-calendar-picker-indicator {
@@ -165,4 +184,28 @@ body {
 .btn-cancel:hover {
     opacity: 1;
     text-decoration: underline;
+}
+
+.alert-duplicado {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: rgba(220, 53, 69, 0.85);
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.alert-duplicado i {
+    font-size: 1rem;
 }

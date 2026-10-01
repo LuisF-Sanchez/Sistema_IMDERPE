@@ -2,11 +2,14 @@
 session_start();
 require_once '../controlador/conexion.php';
 
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $sql = "SELECT * FROM empleados WHERE id = $id";
+if (!isset($_SESSION['usuario_nombre'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+if (isset($_GET['id'])) {$id = intval($_GET['id']);$sql = "SELECT * FROM empleados WHERE id = $id";
     $resultado = $conexion->query($sql);
-    $empleado = $resultado->fetch_assoc();
+    $empleado =$resultado->fetch_assoc();
 
     if (!$empleado) {
         header("Location: ver_empleados.php");
@@ -16,6 +19,9 @@ if (isset($_GET['id'])) {
     header("Location: ver_empleados.php");
     exit();
 }
+
+$error_duplicado =$_GET['error'] ?? '';
+$campo_duplicado =$_GET['campo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -28,7 +34,7 @@ if (isset($_GET['id'])) {
 </head>
 <body>
     <div class="login-container">
-        <form action="../controlador/controlador_editar_empleado.php" method="POST" enctype="multipart/form-data" class="glass-form">
+        <form action="../controlador/controlador_editar_empleado.php" method="POST" enctype="multipart/form-data" class="glass-form" novalidate>
             <div class="logo-container">
                 <img src="../estilo/logo.png" alt="Logo IMDERPE" class="logo-form">
             </div>
@@ -39,22 +45,26 @@ if (isset($_GET['id'])) {
             <div class="form-grid">
                 <div class="input-group">
                     <i class="fas fa-id-card"></i>
-                    <input type="text" name="cedula" value="<?php echo htmlspecialchars($empleado['cedula']); ?>" placeholder="Cédula de Identidad" required>
+                    <input type="text" name="cedula" value="<?php echo htmlspecialchars($empleado['cedula']); ?>" placeholder="Cédula de Identidad">
+                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'cedula'): ?>
+                        <span class="error-mensaje error-backend">* La cédula ya existe en el sistema</span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="nombre" value="<?php echo htmlspecialchars($empleado['nombre']); ?>" placeholder="Nombres" required>
+                    <input type="text" name="nombre" value="<?php echo htmlspecialchars($empleado['nombre']); ?>" placeholder="Nombres">
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="apellido" value="<?php echo htmlspecialchars($empleado['apellido']); ?>" placeholder="Apellidos" required>
+                    <input type="text" name="apellido" value="<?php echo htmlspecialchars($empleado['apellido']); ?>" placeholder="Apellidos">
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-briefcase"></i>
-                    <select name="cargo" required>
+                    <select name="cargo">
+                        <option value="" disabled>Seleccione Cargo</option>
                         <option value="Por asignar" <?php echo ($empleado['cargo'] == 'Por asignar') ? 'selected' : ''; ?>>Por asignar</option>
                         <option value="Presidente" <?php echo ($empleado['cargo'] == 'Presidente') ? 'selected' : ''; ?>>Presidente</option>
                         <option value="Administrador" <?php echo ($empleado['cargo'] == 'Administrador') ? 'selected' : ''; ?>>Administrador</option>
@@ -79,24 +89,31 @@ if (isset($_GET['id'])) {
 
                 <div class="input-group">
                     <i class="fas fa-phone"></i>
-                    <input type="text" name="telefono" value="<?php echo htmlspecialchars($empleado['telefono']); ?>" placeholder="Número de Teléfono" required>
+                    <input type="text" name="telefono" value="<?php echo htmlspecialchars($empleado['telefono']); ?>" placeholder="Número de Teléfono">
+                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'telefono'): ?>
+                        <span class="error-mensaje error-backend">* Este número ya existe en el sistema</span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-envelope"></i>
-                    <input type="email" name="correo" value="<?php echo htmlspecialchars($empleado['correo']); ?>" placeholder="Correo Electrónico" required>
+                    <input type="email" name="correo" value="<?php echo htmlspecialchars($empleado['correo']); ?>" placeholder="Correo Electrónico">
+                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'correo'): ?>
+                        <span class="error-mensaje error-backend">* Este correo ya existe en el sistema</span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-toggle-on"></i>
-                    <select name="estado" required>
+                    <select name="estado">
+                        <option value="" disabled>Seleccione Estado</option>
                         <option value="activo" <?php echo ($empleado['estado'] == 'activo') ? 'selected' : ''; ?>>Activo</option>
                         <option value="inactivo" <?php echo ($empleado['estado'] == 'inactivo') ? 'selected' : ''; ?>>Inactivo</option>
                     </select>
                 </div>
             </div>
 
-            <div class="file-group">
+            <div class="input-group file-group">
                 <label class="file-label" for="foto">
                     <i class="fas fa-camera"></i> Nueva Foto (Opcional)
                 </label>
@@ -109,5 +126,80 @@ if (isset($_GET['id'])) {
             </div>
         </form>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.glass-form');
+
+        if (window.location.search.includes('error=duplicado')) {
+            window.history.replaceState({}, document.title, window.location.pathname + '?id=<?php echo $empleado['id']; ?>');
+        }
+
+        const errorBackend = document.querySelector('.error-backend');
+        if (errorBackend) {
+            const inputDuplicado = errorBackend.closest('.input-group').querySelector('input, select');
+            if (inputDuplicado) inputDuplicado.classList.add('input-error');
+        }
+
+        function ocultarErroresGrupo(parentGroup) {
+            parentGroup.querySelectorAll('.error-mensaje').forEach(el => el.remove());
+            const input = parentGroup.querySelector('input, select');
+            if (input) input.classList.remove('input-error');
+        }
+
+        const todosLosInputs = form.querySelectorAll('input, select');
+        todosLosInputs.forEach(input => {
+            const parent = input.closest('.input-group');
+            if (parent) {
+                input.addEventListener('input', () => ocultarErroresGrupo(parent));
+                input.addEventListener('change', () => ocultarErroresGrupo(parent));
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            let hayError = false;
+
+            form.querySelectorAll('.error-mensaje:not(.error-backend)').forEach(el => el.remove());
+
+            const campos = form.querySelectorAll('.form-grid input, .form-grid select');
+
+            campos.forEach(campo => {
+                const parentGroup = campo.closest('.input-group');
+                
+                if (!campo.value || campo.value.trim() === "") {
+                    hayError = true;
+                    campo.classList.add('input-error');
+
+                    const errorBackendEnGrupo = parentGroup.querySelector('.error-backend');
+                    if (errorBackendEnGrupo) errorBackendEnGrupo.remove();
+
+                    if (!parentGroup.querySelector('.error-mensaje-js')) {
+                        let mensaje = "* Debe colocar este campo";
+
+                        if (campo.tagName === 'SELECT') {
+                            let textoOpcion = campo.options[0].text.replace('Seleccione ', '');
+                            mensaje = `* Debe seleccionar ${textoOpcion.toLowerCase()}`;
+                        } else if (campo.type === 'date') {
+                            mensaje = "* Debe seleccionar la fecha de ingreso";
+                        } else if (campo.getAttribute('placeholder')) {
+                            let placeholderText = campo.getAttribute('placeholder').toLowerCase();
+                            mensaje = `* Debe colocar ${placeholderText}`;
+                        }
+
+                        const msgError = document.createElement('span');
+                        msgError.className = 'error-mensaje error-mensaje-js';
+                        msgError.innerHTML = mensaje;
+
+                        parentGroup.appendChild(msgError);
+                    }
+                }
+            });
+
+            if (hayError) {
+                e.preventDefault();
+            }
+        });
+    });
+    </script>
 </body>
 </html>

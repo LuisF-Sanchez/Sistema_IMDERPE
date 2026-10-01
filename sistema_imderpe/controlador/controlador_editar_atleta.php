@@ -35,6 +35,14 @@ if (!empty($_POST["btn_actualizar"])) {
     $disciplina_id = intval($_POST['disciplina_id']);
     $estado = $_POST['estado'];
 
+    // Validar si la cédula existe en otro registro
+    $check_cedula = $conexion->query("SELECT id FROM atletas WHERE cedula = '$cedula' AND id != $id");
+    if ($check_cedula->num_rows > 0) {
+        // CORRECCIÓN: Se envía el parámetro id para que no pierda la vista del formulario
+        header("Location: ../vista/editar_atleta.php?id=" . $id . "&error=duplicado&campo=cedula");
+        exit();
+    }
+
     $sql = $conexion->query("UPDATE atletas SET 
         cedula = '$cedula', 
         nombre = '$nombre', 

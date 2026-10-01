@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['usuario_nombre'])) {
+    header("Location: ../index.php");
+    exit();
+}
 require_once '../controlador/conexion.php';
 
 $res_representantes = $conexion->query("SELECT id, nombre, apellido, cedula FROM representantes ORDER BY nombre ASC");
@@ -17,113 +21,110 @@ $res_disciplinas = $conexion->query("SELECT id, nombre_disciplina FROM disciplin
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <header class="main-header">
-        <div class="header-container">
-            <a href="ver_atletas.php" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Volver a la Lista
-            </a>
-        </div>
-    </header>
+    <div class="login-container">
+        <form id="form-atleta" action="../controlador/controlador_registrar_atleta.php" method="POST" class="glass-form" novalidate>
+            <div class="logo-container">
+                <img src="../estilo/logo.png" alt="Logo IMDERPE" class="logo-form">
+            </div>
+            <h2 class="form-title">Registro de Atleta</h2>
 
-    <main class="central-container">
-        <div class="glass-form-container">
-            <div class="form-header">
-                <i class="fas fa-running fa-2x"></i>
-                <h2>Registro de Atleta</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="cedula" name="cedula" placeholder="Cédula de Identidad">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="nombre" name="nombre" placeholder="Nombre">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="apellido" name="apellido" placeholder="Apellido">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" title="Fecha de Nacimiento">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-venus-mars"></i>
+                    <select id="genero" name="genero">
+                        <option value="" disabled selected>Seleccione Género</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="comuna" name="comuna" placeholder="Comuna">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-layer-group"></i>
+                    <select id="categoria" name="categoria">
+                        <option value="" disabled selected>Seleccione Categoría</option>
+                        <option value="Infantil">Infantil</option>
+                        <option value="Juvenil">Juvenil</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-trophy"></i>
+                    <select id="disciplina_id" name="disciplina_id">
+                        <option value="" disabled selected>Seleccione Disciplina</option>
+                        <?php while($d = $res_disciplinas->fetch_assoc()): ?>
+                            <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($d['nombre_disciplina']); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-user-tie"></i>
+                    <select id="entrenador_id" name="entrenador_id">
+                        <option value="" disabled selected>Seleccione Entrenador</option>
+                        <?php while($e = $res_entrenadores->fetch_assoc()): ?>
+                            <option value="<?php echo $e['id']; ?>"><?php echo htmlspecialchars($e['nombre'] . " " . $e['apellido']); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-users"></i>
+                    <div class="select-with-btn">
+                        <select name="representante_id" id="select-representante">
+                            <option value="" disabled selected>Seleccione Representante</option>
+                            <?php $res_representantes->data_seek(0); while($r = $res_representantes->fetch_assoc()): ?>
+                                <option value="<?php echo $r['id']; ?>">
+                                    <?php echo htmlspecialchars($r['cedula'] . " - " . $r['nombre'] . " " . $r['apellido']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                        <button type="button" class="btn-add-fast" onclick="abrirModal()" title="Nuevo Representante">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <form action="../controlador/controlador_registrar_atleta.php" method="POST" class="main-form">
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label><i class="fas fa-id-card"></i> Cédula</label>
-                        <input type="text" name="cedula" placeholder="Ej: 25123456" required>
+            <div class="action-row">
+                <?php if (isset($_GET['error']) && $_GET['error'] == 'cedula_existe'): ?>
+                    <div class="alert-error-box">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>La cédula ingresada ya se encuentra registrada en el sistema.</span>
                     </div>
+                <?php endif; ?>
 
-                    <div class="input-group">
-                        <label><i class="fas fa-user"></i> Nombre</label>
-                        <input type="text" name="nombre" required>
-                    </div>
+                <button type="submit" name="btn_registrar" value="ok" class="btn-register">Registrar Atleta</button>
+                <a href="ver_atletas.php" class="btn-cancel">Cancelar y Volver</a>
+            </div>
+        </form>
+    </div>
 
-                    <div class="input-group">
-                        <label><i class="fas fa-user"></i> Apellido</label>
-                        <input type="text" name="apellido" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-calendar-alt"></i> Fecha de Nacimiento</label>
-                        <input type="date" name="fecha_nacimiento" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-venus-mars"></i> Género</label>
-                        <select name="genero" required>
-                            <option value="">Seleccione...</option>
-                            <option value="M">Masculino</option>
-                            <option value="F">Femenino</option>
-                        </select>
-                    </div>
-
-                    <!-- NUEVO CAMPO: COMUNA -->
-                    <div class="input-group">
-                        <label><i class="fas fa-map-marker-alt"></i> Comuna</label>
-                        <input type="text" name="comuna" placeholder="Ej: Comuna La Guadalupe" required>
-                    </div>
-
-                    <!-- NUEVO CAMPO: CATEGORÍA -->
-                    <div class="input-group">
-                        <label><i class="fas fa-layer-group"></i> Categoría</label>
-                        <select name="categoria" required>
-                            <option value="">Seleccione...</option>
-                            <option value="Infantil">Infantil</option>
-                            <option value="Juvenil">Juvenil</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-trophy"></i> Disciplina</label>
-                        <select name="disciplina_id" required>
-                            <option value="">Seleccione disciplina...</option>
-                            <?php while($d = $res_disciplinas->fetch_assoc()): ?>
-                                <option value="<?php echo $d['id']; ?>"><?php echo $d['nombre_disciplina']; ?></option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-user-tie"></i> Entrenador</label>
-                        <select name="entrenador_id" required>
-                            <option value="">Seleccione entrenador...</option>
-                            <?php while($e = $res_entrenadores->fetch_assoc()): ?>
-                                <option value="<?php echo $e['id']; ?>"><?php echo $e['nombre'] . " " . $e['apellido']; ?></option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-users"></i> Representante</label>
-                        <div class="select-with-btn">
-                            <select name="representante_id" id="select-representante" required>
-                                <option value="">Seleccione...</option>
-                                <?php $res_representantes->data_seek(0); while($r = $res_representantes->fetch_assoc()): ?>
-                                    <option value="<?php echo $r['id']; ?>">
-                                        <?php echo $r['cedula'] . " - " . $r['nombre']; ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            </select>
-                            <button type="button" class="btn-add-fast" onclick="abrirModal()" title="Nuevo Representante">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" name="btn_registrar" value="ok" class="btn-submit">Registrar Atleta</button>
-                </div>
-            </form>
-        </div>
-    </main>
-
+    <!-- MODAL DE REPRESENTANTE RÁPIDO -->
     <div id="modalRepresentante" class="modal">
         <div class="modal-bubble">
             <span class="close-btn" onclick="cerrarModal()">&times;</span>
@@ -132,34 +133,35 @@ $res_disciplinas = $conexion->query("SELECT id, nombre_disciplina FROM disciplin
                 <h3>Nuevo Representante</h3>
             </div>
             
-            <form id="form-representante-rapido">
+            <form id="form-representante-rapido" novalidate>
                 <div class="modal-grid">
                     <div class="input-group">
-                        <label>Cédula</label>
-                        <input type="text" id="rep_cedula" required>
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="rep_cedula" placeholder="Cédula">
                     </div>
                     <div class="input-group">
-                        <label>Nombre</label>
-                        <input type="text" id="rep_nombre" required>
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="rep_nombre" placeholder="Nombre">
                     </div>
                     <div class="input-group">
-                        <label>Apellido</label>
-                        <input type="text" id="rep_apellido" required>
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="rep_apellido" placeholder="Apellido">
                     </div>
                     <div class="input-group">
-                        <label>Teléfono</label>
-                        <input type="text" id="rep_telefono" placeholder="Ej: 0412-1234567" required>
+                        <i class="fas fa-phone"></i>
+                        <input type="text" id="rep_telefono" placeholder="Número de Teléfono">
                     </div>
                     <div class="input-group full-width">
-                        <label>Correo Electrónico</label>
-                        <input type="email" id="rep_correo" placeholder="correo@ejemplo.com">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="rep_correo" placeholder="Correo Electrónico">
                     </div>
-                    <div class="input-group full-width">
-                        <label>Dirección de Habitación</label>
-                        <textarea id="rep_direccion" rows="2" placeholder="Especifique calle, sector..."></textarea>
+                    <div class="input-group full-width textarea-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <textarea id="rep_direccion" rows="2" placeholder="Dirección de Habitación (Calle, Sector...)"></textarea>
                     </div>
                 </div>
-                <button type="button" onclick="guardarRepresentante()" class="btn-submit">
+
+                <button type="button" onclick="guardarRepresentante()" class="btn-register modal-submit-btn">
                     <i class="fas fa-save"></i> Guardar y Seleccionar
                 </button>
             </form>
@@ -167,12 +169,76 @@ $res_disciplinas = $conexion->query("SELECT id, nombre_disciplina FROM disciplin
     </div>
 
     <script>
+        const formAtleta = document.getElementById('form-atleta');
+
+        function ocultarErroresGrupo(parentGroup) {
+            parentGroup.querySelectorAll('.error-mensaje').forEach(el => el.remove());
+            const input = parentGroup.querySelector('input, select, textarea');
+            if (input) input.classList.remove('input-error');
+        }
+
+        document.addEventListener('input', function(e) {
+            const parent = e.target.closest('.input-group');
+            if (parent) ocultarErroresGrupo(parent);
+        });
+
+        document.addEventListener('change', function(e) {
+            const parent = e.target.closest('.input-group');
+            if (parent) ocultarErroresGrupo(parent);
+        });
+
+        function mostrarErrorCampo(campo, mensaje) {
+            campo.classList.add('input-error');
+            const parentGroup = campo.closest('.input-group');
+            if (parentGroup && !parentGroup.querySelector('.error-mensaje')) {
+                const msgError = document.createElement('span');
+                msgError.className = 'error-mensaje';
+                msgError.innerHTML = mensaje;
+                parentGroup.appendChild(msgError);
+            }
+        }
+
+        formAtleta.addEventListener('submit', function(e) {
+            formAtleta.querySelectorAll('.error-mensaje').forEach(el => el.remove());
+            formAtleta.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+
+            let hayError = false;
+
+            const campos = [
+                { id: 'cedula', msg: '* Debe colocar la cédula' },
+                { id: 'nombre', msg: '* Debe colocar el nombre' },
+                { id: 'apellido', msg: '* Debe colocar el apellido' },
+                { id: 'fecha_nacimiento', msg: '* Debe seleccionar la fecha de nacimiento' },
+                { id: 'genero', msg: '* Debe seleccionar el género' },
+                { id: 'comuna', msg: '* Debe colocar la comuna' },
+                { id: 'categoria', msg: '* Debe seleccionar la categoría' },
+                { id: 'disciplina_id', msg: '* Debe seleccionar una disciplina' },
+                { id: 'entrenador_id', msg: '* Debe seleccionar un entrenador' },
+                { id: 'select-representante', msg: '* Debe seleccionar un representante' }
+            ];
+
+            campos.forEach(campo => {
+                const elem = document.getElementById(campo.id);
+                if (elem && (!elem.value || elem.value.trim() === "")) {
+                    hayError = true;
+                    mostrarErrorCampo(elem, campo.msg);
+                }
+            });
+
+            if (hayError) {
+                e.preventDefault();
+            }
+        });
+
         function abrirModal() {
             document.getElementById('modalRepresentante').style.display = 'flex';
         }
 
         function cerrarModal() {
-            document.getElementById('modalRepresentante').style.display = 'none';
+            const modal = document.getElementById('modalRepresentante');
+            modal.style.display = 'none';
+            modal.querySelectorAll('.error-mensaje').forEach(el => el.remove());
+            modal.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
         }
 
         window.onclick = function(event) {
@@ -181,12 +247,34 @@ $res_disciplinas = $conexion->query("SELECT id, nombre_disciplina FROM disciplin
         }
 
         function guardarRepresentante() {
+            const modal = document.getElementById('modalRepresentante');
+
+            // Limpia mensajes y estilos previos
+            modal.querySelectorAll('.error-mensaje').forEach(el => el.remove());
+            modal.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+
+            let hayErrorModal = false;
+
+            const repCedula = document.getElementById('rep_cedula');
+            const repNombre = document.getElementById('rep_nombre');
+            const repApellido = document.getElementById('rep_apellido');
+            const repTelefono = document.getElementById('rep_telefono');
+            const repCorreo = document.getElementById('rep_correo');
+
+            // Validaciones locales básicas
+            if (!repCedula.value.trim()) { mostrarErrorCampo(repCedula, '* Requerido'); hayErrorModal = true; }
+            if (!repNombre.value.trim()) { mostrarErrorCampo(repNombre, '* Requerido'); hayErrorModal = true; }
+            if (!repApellido.value.trim()) { mostrarErrorCampo(repApellido, '* Requerido'); hayErrorModal = true; }
+            if (!repTelefono.value.trim()) { mostrarErrorCampo(repTelefono, '* Requerido'); hayErrorModal = true; }
+
+            if (hayErrorModal) return;
+
             const datos = new FormData();
-            datos.append('cedula', document.getElementById('rep_cedula').value);
-            datos.append('nombre', document.getElementById('rep_nombre').value);
-            datos.append('apellido', document.getElementById('rep_apellido').value);
-            datos.append('telefono', document.getElementById('rep_telefono').value);
-            datos.append('correo', document.getElementById('rep_correo').value);
+            datos.append('cedula', repCedula.value);
+            datos.append('nombre', repNombre.value);
+            datos.append('apellido', repApellido.value);
+            datos.append('telefono', repTelefono.value);
+            datos.append('correo', repCorreo.value);
             datos.append('direccion', document.getElementById('rep_direccion').value);
 
             fetch('../controlador/controlador_registrar_representante_fast.php', {
@@ -206,7 +294,19 @@ $res_disciplinas = $conexion->query("SELECT id, nombre_disciplina FROM disciplin
                     document.getElementById('form-representante-rapido').reset();
                     cerrarModal();
                 } else {
-                    alert("Error: " + (data.error || "No se pudo registrar"));
+                    // SI EL SERVIDOR DEVUELVE UN DICCIONARIO CON MÚLTIPLES ERRORES
+                    if (data.errors) {
+                        if (data.errors.cedula) mostrarErrorCampo(repCedula, '* ' + data.errors.cedula);
+                        if (data.errors.telefono) mostrarErrorCampo(repTelefono, '* ' + data.errors.telefono);
+                        if (data.errors.correo) mostrarErrorCampo(repCorreo, '* ' + data.errors.correo);
+                    } else if (data.error) {
+                        // REPALDO SI DEVUELVE UN SOLO TEXTO DE ERROR
+                        const errorLower = data.error.toLowerCase();
+                        if (errorLower.includes('cédula')) mostrarErrorCampo(repCedula, '* ' + data.error);
+                        else if (errorLower.includes('teléfono')) mostrarErrorCampo(repTelefono, '* ' + data.error);
+                        else if (errorLower.includes('correo')) mostrarErrorCampo(repCorreo, '* ' + data.error);
+                        else alert(data.error);
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));

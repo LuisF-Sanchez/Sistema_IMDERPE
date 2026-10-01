@@ -1,5 +1,6 @@
 <?php
-require_once 'conexion.php';
+require_once '../controlador/conexion.php';
 
-$resultado = $conexion->query("SELECT id, cedula, nombre, apellido, correo, direccion FROM representantes ORDER BY nombre ASC");
+$sql = "SELECT id, cedula, nombre, apellido, telefono, correo, direccion FROM representantes";
+$resultado = $conexion->query($sql);
 ?>
