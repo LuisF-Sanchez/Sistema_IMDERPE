@@ -9,6 +9,7 @@ require_once '../controlador/conexion.php';
 $periodo = isset($_GET['periodo']) ? $_GET['periodo'] : 'mensual';
 $fecha_desde = isset($_GET['fecha_desde']) ? $_GET['fecha_desde'] : '';
 $fecha_hasta = isset($_GET['fecha_hasta']) ? $_GET['fecha_hasta'] : '';
+$tipo_filtro = isset($_GET['tipo']) ? trim($_GET['tipo']) : '';
 
 $url_params = "";
 
@@ -45,6 +46,12 @@ if (!empty($fecha_desde) && !empty($fecha_hasta)) {
     $url_params = "periodo=$periodo";
 }
 
+// Mantener el parámetro de tipo en la URL si está seleccionado
+if (!empty($tipo_filtro)) {
+    $url_params .= "&tipo=" . urlencode($tipo_filtro);
+}
+
+// 1. Obtener datos para la gráfica general
 $query_grafica = "SELECT t.nombre_tipo, COUNT(a.id) as total 
                   FROM actividades a
                   INNER JOIN tipos_actividad t ON a.tipo_id = t.id 
@@ -62,15 +69,38 @@ while ($row = $res_grafica->fetch_assoc()) {
     $total_general_actividades += $row['total']; 
 }
 
+// 2. Filtro extra para la tabla si se seleccionó una barra específica
+$filtro_tipo_sql = "";
+if (!empty($tipo_filtro)) {
+    $filtro_tipo_sql = " AND t.nombre_tipo = '" . $conexion->real_escape_string($tipo_filtro) . "'";
+}
+
+// 3. Configuración de Paginación (10 registros por página)
+$registros_por_pagina = 10;
+$pagina_actual = isset($_GET['pag']) ? (int)$_GET['pag'] : 1;
+if ($pagina_actual < 1) $pagina_actual = 1;
+$offset = ($pagina_actual - 1) * $registros_por_pagina;
+
+// Total de registros para la tabla según el filtro
+$sql_total_tabla = "SELECT COUNT(a.id) as total 
+                    FROM actividades a
+                    INNER JOIN tipos_actividad t ON a.tipo_id = t.id
+                    $filtro_sql $filtro_tipo_sql";
+$res_total_tabla = $conexion->query($sql_total_tabla);
+$total_registros_tabla = $res_total_tabla ? $res_total_tabla->fetch_assoc()['total'] : 0;
+$total_paginas = ceil($total_registros_tabla / $registros_por_pagina);
+
+// Consulta paginada para la tabla
 $query_tabla = "SELECT a.id, a.nombre_actividad, a.fecha, a.lugar, t.nombre_tipo, 
                        GROUP_CONCAT(CONCAT(e.nombre, ' ', e.apellido) SEPARATOR ', ') AS responsables
                 FROM actividades a
                 INNER JOIN tipos_actividad t ON a.tipo_id = t.id
                 LEFT JOIN actividad_responsables ar ON a.id = ar.actividad_id
                 LEFT JOIN empleados e ON ar.empleado_id = e.id
-                $filtro_sql 
+                $filtro_sql $filtro_tipo_sql
                 GROUP BY a.id, t.nombre_tipo
-                ORDER BY a.fecha DESC";
+                ORDER BY a.fecha DESC
+                LIMIT $registros_por_pagina OFFSET $offset";
 $res_tabla = $conexion->query($query_tabla);
 ?>
 
@@ -90,9 +120,9 @@ $res_tabla = $conexion->query($query_tabla);
         <div class="glass-card tools-section">
             <div class="header-filters-layout">
                 <div class="filter-buttons">
-                    <a href="?periodo=mensual" class="btn-filter <?php echo $periodo == 'mensual' ? 'active' : ''; ?>">Mensual</a>
-                    <a href="?periodo=trimestral" class="btn-filter <?php echo $periodo == 'trimestral' ? 'active' : ''; ?>">Trimestral</a>
-                    <a href="?periodo=anual" class="btn-filter <?php echo $periodo == 'anual' ? 'active' : ''; ?>">Anual</a>
+                    <a href="?periodo=mensual" class="btn-filter <?php echo ($periodo == 'mensual' && empty($tipo_filtro)) ? 'active' : ''; ?>">Mensual</a>
+                    <a href="?periodo=trimestral" class="btn-filter <?php echo ($periodo == 'trimestral' && empty($tipo_filtro)) ? 'active' : ''; ?>">Trimestral</a>
+                    <a href="?periodo=anual" class="btn-filter <?php echo ($periodo == 'anual' && empty($tipo_filtro)) ? 'active' : ''; ?>">Anual</a>
                 </div>
 
                 <form action="" method="GET" class="date-range-form">
@@ -118,7 +148,12 @@ $res_tabla = $conexion->query($query_tabla);
                 <h2><i class="fas fa-chart-bar"></i> Estadísticas: <?php echo $titulo_grafica; ?></h2>
             </div>
             
-            <div id="statusFiltro" style="text-align: center; color: #FBC02D; font-weight: bold; font-size: 0.95rem; min-height: 20px; margin-bottom: 5px;"></div>
+            <div id="statusFiltro" style="text-align: center; color: #FBC02D; font-weight: bold; font-size: 0.95rem; min-height: 20px; margin-bottom: 5px;">
+                <?php if (!empty($tipo_filtro)): ?>
+                    <i class="fas fa-filter"></i> Enfocado en: <?php echo htmlspecialchars($tipo_filtro); ?> &nbsp;|&nbsp; 
+                    <a href="?<?php echo $periodo == 'personalizado' ? "periodo=personalizado&fecha_desde=$fecha_desde&fecha_hasta=$fecha_hasta" : "periodo=$periodo"; ?>" style="color: #FBC02D; text-decoration: underline;">Mostrar todos</a>
+                <?php endif; ?>
+            </div>
 
             <div class="chart-wrapper" style="position: relative; margin-bottom: 10px;">
                 <canvas id="chartActividades"></canvas>
@@ -127,9 +162,11 @@ $res_tabla = $conexion->query($query_tabla);
             <div class="total-unificado-container" style="display: flex; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 5px;">
                 <div style="background: rgba(29, 61, 129, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 25px; border-radius: 30px; color: white; font-weight: bold; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px;">
                     <i class="fas fa-calculator" style="color: #FBC02D;"></i>
-                    <span id="texto-total-dinamico">Total General Unificado:</span>
+                    <span id="texto-total-dinamico">
+                        <?php echo !empty($tipo_filtro) ? "Total de " . htmlspecialchars($tipo_filtro) . ":" : "Total General Unificado:"; ?>
+                    </span>
                     <span id="valor-total-dinamico" style="background: #FBC02D; color: #1D3D81; padding: 2px 12px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; min-width: 30px; text-align: center;">
-                        <?php echo $total_general_actividades; ?>
+                        <?php echo !empty($tipo_filtro) ? $total_registros_tabla : $total_general_actividades; ?>
                     </span>
                 </div>
             </div>
@@ -179,6 +216,25 @@ $res_tabla = $conexion->query($query_tabla);
                     </tbody>
                 </table>
             </div>
+
+            <!-- Barra de Paginación -->
+            <?php if ($total_paginas > 1): ?>
+                <div class="paginacion-container" style="display: flex; justify-content: center; gap: 8px; margin-top: 20px;">
+                    <?php if ($pagina_actual > 1): ?>
+                        <a href="?<?php echo $url_params; ?>&pag=<?php echo $pagina_actual - 1; ?>" class="btn-pag" style="padding: 6px 12px; background: rgba(255,255,255,0.1); color:white; border-radius:6px; text-decoration:none;">&laquo; Anterior</a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                        <a href="?<?php echo $url_params; ?>&pag=<?php echo $i; ?>" class="btn-pag <?php echo ($i == $pagina_actual) ? 'activa' : ''; ?>" style="padding: 6px 12px; background: <?php echo ($i == $pagina_actual) ? '#FBC02D' : 'rgba(255,255,255,0.1)'; ?>; color: <?php echo ($i == $pagina_actual) ? '#1D3D81' : 'white'; ?>; border-radius:6px; text-decoration:none; font-weight:bold;">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php if ($pagina_actual < $total_paginas): ?>
+                        <a href="?<?php echo $url_params; ?>&pag=<?php echo $pagina_actual + 1; ?>" class="btn-pag" style="padding: 6px 12px; background: rgba(255,255,255,0.1); color:white; border-radius:6px; text-decoration:none;">Siguiente &raquo;</a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
             
             <div class="center-back">
                 <a href="inicio.php" class="btn-back"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
@@ -191,7 +247,7 @@ $res_tabla = $conexion->query($query_tabla);
         const ctx = document.getElementById('chartActividades').getContext('2d');
         const labelsTipos = <?php echo json_encode($labels); ?>;
         const datosTotales = <?php echo json_encode($valores); ?>;
-        const totalUnificadoBase = <?php echo $total_general_actividades; ?>;
+        const tipoActual = "<?php echo $tipo_filtro; ?>";
 
         const finalLabels = labelsTipos.length > 0 ? labelsTipos : ['Sin datos en el rango'];
         const finalData = datosTotales.length > 0 ? datosTotales : [0];
@@ -204,7 +260,20 @@ $res_tabla = $conexion->query($query_tabla);
             'rgba(153, 102, 255, 0.7)'
         ];
         const listaBordes = ['#FBC02D', '#28a745', '#17a2b8', '#007bff', '#9966ff'];
-        let indiceFiltrado = null;
+
+        let bgColores = finalData.map((_, i) => {
+            if (tipoActual && finalLabels[i] === tipoActual) {
+                return listaColores[i % listaColores.length].replace('0.7', '0.95');
+            }
+            return tipoActual ? listaColores[i % listaColores.length].replace('0.7', '0.15') : listaColores[i % listaColores.length];
+        });
+
+        let bdColores = finalData.map((_, i) => {
+            if (tipoActual && finalLabels[i] === tipoActual) {
+                return listaBordes[i % listaBordes.length];
+            }
+            return tipoActual ? 'rgba(255, 255, 255, 0.05)' : listaBordes[i % listaBordes.length];
+        });
 
         const miGrafica = new Chart(ctx, {
             type: 'bar',
@@ -213,8 +282,8 @@ $res_tabla = $conexion->query($query_tabla);
                 datasets: [{
                     label: 'Suma de Actividades',
                     data: finalData,
-                    backgroundColor: [...listaColores],
-                    borderColor: [...listaBordes],
+                    backgroundColor: bgColores,
+                    borderColor: bdColores,
                     borderWidth: 1.5,
                     borderRadius: 5
                 }]
@@ -224,26 +293,6 @@ $res_tabla = $conexion->query($query_tabla);
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false }
-                },
-                onHover: (event, elements) => {
-                    if (indiceFiltrado !== null) return;
-
-                    if (elements.length > 0) {
-                        const idx = elements[0].index;
-                        const nuevosColores = finalData.map((_, i) => 
-                            i === idx ? listaColores[i].replace('0.7', '0.95') : listaColores[i].replace('0.7', '0.15')
-                        );
-                        const nuevosBordes = finalData.map((_, i) => 
-                            i === idx ? listaBordes[i] : 'rgba(255, 255, 255, 0.05)'
-                        );
-                        
-                        miGrafica.data.datasets[0].backgroundColor = nuevosColores;
-                        miGrafica.data.datasets[0].borderColor = nuevosBordes;
-                    } else {
-                        miGrafica.data.datasets[0].backgroundColor = [...listaColores];
-                        miGrafica.data.datasets[0].borderColor = [...listaBordes];
-                    }
-                    miGrafica.update('none');
                 },
                 scales: {
                     y: {
@@ -259,63 +308,21 @@ $res_tabla = $conexion->query($query_tabla);
                 onClick: (event, elements) => {
                     if (elements.length > 0) {
                         const index = elements[0].index;
+                        const clickedTipo = finalLabels[index];
+                        
+                        let baseUrl = window.location.pathname + "?<?php echo $periodo == 'personalizado' ? "periodo=personalizado&fecha_desde=$fecha_desde&fecha_hasta=$fecha_hasta" : "periodo=$periodo"; ?>";
 
-                        if (indiceFiltrado === index) {
-                            revertirFiltroExterno();
+                        // Si hace clic de nuevo en la misma barra activa, limpia el filtro (vuelve al estado normal)
+                        if (tipoActual === clickedTipo) {
+                            window.location.href = baseUrl;
                         } else {
-                            const tipoSeleccionado = finalLabels[index];
-                            const valorSeleccionado = finalData[index];
-                            
-                            miGrafica.data.labels = [tipoSeleccionado];
-                            miGrafica.data.datasets[0].data = [valorSeleccionado];
-                            miGrafica.data.datasets[0].backgroundColor = [listaColores[index]];
-                            miGrafica.data.datasets[0].borderColor = [listaBordes[index]];
-                            indiceFiltrado = index;
-                            
-                            document.getElementById('statusFiltro').innerHTML = 
-                                `<i class="fas fa-filter"></i> Enfocado en: ${tipoSeleccionado} &nbsp;|&nbsp; <span style="cursor:pointer; text-decoration: underline;" onclick="revertirFiltroExterno()">Mostrar todos</span>`;
-                            
-                            document.getElementById('texto-total-dinamico').innerText = "Total de " + tipoSeleccionado + ":";
-                            document.getElementById('valor-total-dinamico').innerText = valorSeleccionado;
-                            
-                            filtrarTablaHTML(tipoSeleccionado);
-                            miGrafica.update();
+                            // Si hace clic en otra barra, aplica el filtro nuevo
+                            window.location.href = baseUrl + "&tipo=" + encodeURIComponent(clickedTipo);
                         }
                     }
                 }
             }
         });
-
-        function filtrarTablaHTML(tipo) {
-            const filas = document.querySelectorAll('#tablaAuditoria tbody tr');
-            filas.forEach(fila => {
-                const badge = fila.querySelector('.badge-tipo');
-                if (badge) {
-                    if (badge.textContent.trim() === tipo) {
-                        fila.style.display = '';
-                    } else {
-                        fila.style.display = 'none';
-                    }
-                }
-            });
-        }
-
-        function revertirFiltroExterno() {
-            miGrafica.data.labels = finalLabels;
-            miGrafica.data.datasets[0].data = finalData;
-            miGrafica.data.datasets[0].backgroundColor = [...listaColores];
-            miGrafica.data.datasets[0].borderColor = [...listaBordes];
-            indiceFiltrado = null;
-            document.getElementById('statusFiltro').innerText = "";
-            
-            document.getElementById('texto-total-dinamico').innerText = "Total General Unificado:";
-            document.getElementById('valor-total-dinamico').innerText = totalUnificadoBase;
-            
-            const filas = document.querySelectorAll('#tablaAuditoria tbody tr');
-            filas.forEach(fila => fila.style.display = '');
-            
-            miGrafica.update();
-        }
     </script>
 </body>
 </html>

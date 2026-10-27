@@ -60,13 +60,16 @@ $stmt_insert->bind_param("ssssss", $cedula, $nombre, $apellido, $telefono, $corr
 if ($stmt_insert->execute()) {
     $nuevo_id = $stmt_insert->insert_id;
 
-    // Registrar en la bitácora
-    $id_usuario = $_SESSION['usuario_id'] ?? null;
-    $accion = "REGISTRO_REPRESENTANTE_RAPIDO";
-    $descripcion = "Se registró rápidamente al representante '{$nombre} {$apellido}' (Cédula: {$cedula})";
+    // Registrar en la bitácora con formato estándar y limpio
+    $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Administrador');
+    $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+    
+    $accion = "Registro de Representante";
+    $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+    $descripcion = "El {$rol} {$nombre_user} ha registrado al representante {$nombre} {$apellido}{$cedula_txt}.";
 
     if (function_exists('registrar_bitacora')) {
-        registrar_bitacora($conexion, $id_usuario, $accion, $descripcion);
+        registrar_bitacora($conexion, $accion, $descripcion);
     }
 
     echo json_encode([

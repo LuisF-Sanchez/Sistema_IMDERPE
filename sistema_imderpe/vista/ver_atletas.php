@@ -2,7 +2,11 @@
 session_start();
 require_once '../controlador/controlador_atletas.php';
 
-$categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+// Armar los parámetros de los filtros para mantenerlos en los enlaces de la paginación
+$filtros_query = "";
+if (!empty($disciplina_filtro)) $filtros_query .= "&disciplina=" . urlencode($disciplina_filtro);
+if (!empty($genero_filtro)) $filtros_query .= "&genero=" . urlencode($genero_filtro);
+if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($categoria_filtro);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -11,6 +15,7 @@ $categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Atletas - IMDERPE</title>
     <link rel="stylesheet" href="../estilo/style8.css">
+    <link rel="stylesheet" href="../estilo/style5.css"> <!-- Para heredar .paginacion-header y .num-box -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -19,6 +24,43 @@ $categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
             <a href="../vista/inicio.php" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Volver al Inicio
             </a>
+
+            <!-- APARTADO DE NÚMEROS / PAGINACIÓN EN EL ENCABEZADO -->
+            <?php if (isset($total_paginas) && $total_paginas > 1): ?>
+                <div class="paginacion-header">
+                    <!-- Flecha Anterior -->
+                    <?php if ($pagina > 1): ?>
+                        <a href="ver_atletas.php?pagina=<?php echo $pagina - 1 . $filtros_query; ?>" class="num-box nav-arrow" title="Página Anterior">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- Cálculo de rango giratorio de hasta 5 números visibles -->
+                    <?php 
+                        $max_visibles = 5;
+                        $inicio_num = max(1, $pagina - floor($max_visibles / 2));
+                        $fin_num = min($total_paginas, $inicio_num + $max_visibles - 1);
+
+                        if (($fin_num - $inicio_num + 1) < $max_visibles) {
+                            $inicio_num = max(1, $fin_num - $max_visibles + 1);
+                        }
+
+                        for ($i = $inicio_num; $i <= $fin_num; $i++): 
+                    ?>
+                        <a href="ver_atletas.php?pagina=<?php echo $i . $filtros_query; ?>" class="num-box <?php echo ($i == $pagina) ? 'active' : ''; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <!-- Flecha Siguiente -->
+                    <?php if ($pagina < $total_paginas): ?>
+                        <a href="ver_atletas.php?pagina=<?php echo $pagina + 1 . $filtros_query; ?>" class="num-box nav-arrow" title="Página Siguiente">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
             <a href="registrar_atletas.php" class="btn-back">
                 <i class="fas fa-running"></i> Registrar Atleta
             </a>
@@ -34,7 +76,7 @@ $categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
                 <i class="fas fa-dumbbell" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.8); z-index: 1;"></i>
                 <select name="disciplina" onchange="this.form.submit()" style="width: 100%; padding: 12px 12px 12px 45px; background: #1D3D81; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; color: white; outline: none; box-sizing: border-box; font-size: 0.95rem; cursor: pointer;">
                     <option value="" style="background: #1D3D81; color: white;">Todas las Disciplinas</option>
-                    <?php if ($resultado_disciplinas && $resultado_disciplinas->num_rows > 0): ?>
+                    <?php if (isset($resultado_disciplinas) && $resultado_disciplinas->num_rows > 0): ?>
                         <?php while($disc = $resultado_disciplinas->fetch_assoc()): ?>
                             <option value="<?php echo $disc['id']; ?>" <?php echo ($disciplina_filtro == $disc['id']) ? 'selected' : ''; ?> style="background: #1D3D81; color: white;">
                                 <?php echo htmlspecialchars($disc['nombre_disciplina']); ?>
@@ -96,11 +138,11 @@ $categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
                                 <td><?php echo htmlspecialchars($row['apellido']); ?></td>
                                 <td><?php echo htmlspecialchars($row['genero']); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($row['fecha_nacimiento'])); ?></td>
-                                <td><?php echo htmlspecialchars($row['nombre_rep'] . " " . $row['apellido_rep']); ?></td>
-                                <td><?php echo htmlspecialchars($row['nombre_ent'] . " " . $row['apellido_ent']); ?></td>
+                                <td><?php echo htmlspecialchars(($row['nombre_rep'] ?? '') . " " . ($row['apellido_rep'] ?? '')); ?></td>
+                                <td><?php echo htmlspecialchars(($row['nombre_ent'] ?? '') . " " . ($row['apellido_ent'] ?? '')); ?></td>
                                 <td><?php echo htmlspecialchars($row['comuna']); ?></td>
                                 <td style="text-transform: capitalize; font-weight: 500; color: #FBC02D;"><?php echo htmlspecialchars($row['categoria']); ?></td>
-                                <td><span class="badge-disciplina"><?php echo htmlspecialchars($row['disciplina']); ?></span></td>
+                                <td><span class="badge-disciplina"><?php echo htmlspecialchars($row['disciplina'] ?? 'Sin asignar'); ?></span></td>
                                 <td style="text-align: center;">
                                     <?php $clase = ($row['estado'] == 'activo') ? 'estado-activo' : 'estado-inactivo'; ?>
                                     <span class="badge-estado <?php echo $clase; ?>"><?php echo ucfirst($row['estado']); ?></span>

@@ -17,6 +17,43 @@ require_once '../controlador/controlador_empleados.php';
             <a href="../vista/inicio.php" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Volver al Inicio
             </a>
+
+            <!-- APARTADO DE NÚMEROS / PAGINACIÓN EN EL ENCABEZADO -->
+            <?php if ($total_paginas > 1): ?>
+                <div class="paginacion-header">
+                    <!-- Flecha Anterior -->
+                    <?php if ($pagina > 1): ?>
+                        <a href="ver_empleados.php?pagina=<?php echo $pagina - 1; ?>" class="num-box nav-arrow" title="Página Anterior">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- Cálculo de rango de 5 números máximo -->
+                    <?php 
+                        $max_visibles = 5;
+                        $inicio_num = max(1, $pagina - floor($max_visibles / 2));
+                        $fin_num = min($total_paginas, $inicio_num + $max_visibles - 1);
+
+                        if (($fin_num - $inicio_num + 1) < $max_visibles) {
+                            $inicio_num = max(1, $fin_num - $max_visibles + 1);
+                        }
+
+                        for ($i = $inicio_num; $i <= $fin_num; $i++): 
+                    ?>
+                        <a href="ver_empleados.php?pagina=<?php echo $i; ?>" class="num-box <?php echo ($i == $pagina) ? 'active' : ''; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <!-- Flecha Siguiente -->
+                    <?php if ($pagina < $total_paginas): ?>
+                        <a href="ver_empleados.php?pagina=<?php echo $pagina + 1; ?>" class="num-box nav-arrow" title="Página Siguiente">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
             <a href="registrar_empleado.php" class="btn-back">
                 <i class="fas fa-user-plus"></i> Registrar Empleado
             </a>
@@ -70,18 +107,16 @@ require_once '../controlador/controlador_empleados.php';
                                         <?php echo htmlspecialchars($row['cargo']); ?>
                                     </span>
                                 </td>
-                                <!-- Columna 1: Muestra solo la fecha limpia en formato día/mes/año -->
                                 <td>
                                     <?php 
                                     if (!empty($row['fecha_ingreso'])) {
                                         $date = new DateTime($row['fecha_ingreso']);
-                                        echo $date->format('j/n/Y'); // Formato ejemplo: 12/7/2025
+                                        echo $date->format('j/n/Y');
                                     } else {
                                         echo '<span class="text-por-asignar">Por asignar</span>';
                                     }
                                     ?>
                                 </td>
-                                <!-- Columna 2: Calcula y muestra los años de servicio automáticamente -->
                                 <td>
                                     <?php 
                                     if (!empty($row['fecha_ingreso'])) {

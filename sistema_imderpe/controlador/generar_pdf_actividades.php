@@ -63,6 +63,13 @@ class PDF extends FPDF {
     public $titulo_periodo;
 
     function Header() {
+        $ruta_cintillo = '../estilo/cintillo.jpg'; 
+        
+        if (file_exists($ruta_cintillo)) {
+            $this->Image($ruta_cintillo, 0, 0, 210, 25);
+        }
+
+        $this->SetY(28);
  
         $this->SetFont('Arial', 'B', 14);
         $this->SetTextColor(29, 61, 129); 
@@ -74,11 +81,9 @@ class PDF extends FPDF {
         
         $this->Ln(5);
 
-
         $this->SetFillColor(29, 61, 129);
         $this->SetTextColor(255, 255, 255);
         $this->SetFont('Arial', 'B', 9);
-
 
         $this->Cell(45, 8, utf8_decode('Actividad'), 1, 0, 'L', true);
         $this->Cell(22, 8, utf8_decode('Fecha'), 1, 0, 'C', true);
@@ -93,11 +98,65 @@ class PDF extends FPDF {
         $this->SetTextColor(128, 128, 128);
         $this->Cell(0, 10, utf8_decode('Página ') . $this->PageNo() . '/{nb}', 0, 0, 'C');
     }
+
+    public function GetPageBreakTrigger() {
+        return $this->PageBreakTrigger;
+    }
+
+    function NbLines($w, $txt) {
+        $cw = &$this->CurrentFont['cw'];
+        if ($w == 0) {
+            $w = $this->w - $this->rMargin - $this->x;
+        }
+        $wmax = ($w - 2 * $this->cMargin) * 1000 / $this->FontSize;
+        $s = str_replace("\r", '', $txt);
+        $nb = strlen($s);
+        if ($nb > 0 && $s[$nb - 1] == "\n") {
+            $nb--;
+        }
+        $sep = -1;
+        $i = 0;
+        $j = 0;
+        $l = 0;
+        $nl = 1;
+        while ($i < $nb) {
+            $c = $s[$i];
+            if ($c == "\n") {
+                $i++;
+                $sep = -1;
+                $j = $i;
+                $l = 0;
+                $nl++;
+                continue;
+            }
+            if ($c == ' ') {
+                $sep = $i;
+            }
+            $l += $cw[$c];
+            if ($l > $wmax) {
+                if ($sep == -1) {
+                    if ($i == $j) {
+                        $i++;
+                    }
+                } else {
+                    $i = $sep + 1;
+                }
+                $sep = -1;
+                $j = $i;
+                $l = 0;
+                $nl++;
+            } else {
+                $i++;
+            }
+        }
+        return $nl;
+    }
 }
 
 $pdf = new PDF('P', 'mm', 'A4');
 $pdf->titulo_periodo = $titulo_periodo;
 $pdf->AliasNbPages();
+$pdf->SetMargins(10, 55, 10);
 $pdf->AddPage();
 $pdf->SetFont('Arial', '', 8);
 $pdf->SetTextColor(40, 40, 40);
@@ -114,16 +173,53 @@ if ($res_tabla && $res_tabla->num_rows > 0) {
         $tipo = utf8_decode($act['nombre_tipo']);
         $responsables = !empty($act['responsables']) ? utf8_decode($act['responsables']) : 'Sin asignar';
 
+        $w1 = 45;
+        $w2 = 22;
+        $w3 = 35;
+        $w4 = 33;
+        $w5 = 55;
+
+        $nb1 = $pdf->NbLines($w1, $nombre);
+        $nb3 = $pdf->NbLines($w3, $lugar);
+        $nb4 = $pdf->NbLines($w4, $tipo);
+        $nb5 = $pdf->NbLines($w5, $responsables);
+
+        $max_lines = max($nb1, $nb3, $nb4, $nb5);
+        $line_height = 5;
+        $row_height = $max_lines * $line_height;
+
+        if ($pdf->GetY() + $row_height > $pdf->GetPageBreakTrigger()) {
+            $pdf->AddPage();
+        }
+
         $fill = ($total_registros % 2 == 0);
-        $pdf->SetFillColor(240, 243, 248);
+        $pdf->SetFillColor($fill ? 240 : 255, $fill ? 243 : 255, $fill ? 248 : 255);
 
-        $pdf->Cell(45, 7, strlen($nombre) > 26 ? substr($nombre, 0, 24) . '..' : $nombre, 1, 0, 'L', $fill);
-        $pdf->Cell(22, 7, $fecha, 1, 0, 'C', $fill);
-        $pdf->Cell(35, 7, strlen($lugar) > 20 ? substr($lugar, 0, 18) . '..' : $lugar, 1, 0, 'L', $fill);
-        $pdf->Cell(33, 7, strlen($tipo) > 18 ? substr($tipo, 0, 16) . '..' : $tipo, 1, 0, 'L', $fill);
-        $pdf->Cell(55, 7, strlen($responsables) > 33 ? substr($responsables, 0, 31) . '..' : $responsables, 1, 1, 'L', $fill);
+        $x = $pdf->GetX();
+        $y = $pdf->GetY();
+
+        $pdf->Rect($x, $y, $w1, $row_height, $fill ? 'DF' : 'D');
+        $pdf->Rect($x + $w1, $y, $w2, $row_height, $fill ? 'DF' : 'D');
+        $pdf->Rect($x + $w1 + $w2, $y, $w3, $row_height, $fill ? 'DF' : 'D');
+        $pdf->Rect($x + $w1 + $w2 + $w3, $y, $w4, $row_height, $fill ? 'DF' : 'D');
+        $pdf->Rect($x + $w1 + $w2 + $w3 + $w4, $y, $w5, $row_height, $fill ? 'DF' : 'D');
+
+        $pdf->MultiCell($w1, $line_height, $nombre, 0, 'L');
+        
+        $pdf->SetXY($x + $w1, $y);
+        $pdf->MultiCell($w2, $line_height, $fecha, 0, 'C');
+        
+        $pdf->SetXY($x + $w1 + $w2, $y);
+        $pdf->MultiCell($w3, $line_height, $lugar, 0, 'L');
+        
+        $pdf->SetXY($x + $w1 + $w2 + $w3, $y);
+        $pdf->MultiCell($w4, $line_height, $tipo, 0, 'L');
+        
+        $pdf->SetXY($x + $w1 + $w2 + $w3 + $w4, $y);
+        $pdf->MultiCell($w5, $line_height, $responsables, 0, 'L');
+
+        $pdf->SetXY($x, $y + $row_height);
     }
-
 
     $pdf->Ln(3);
     $pdf->SetFont('Arial', 'B', 9);

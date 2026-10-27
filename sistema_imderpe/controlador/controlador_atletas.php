@@ -1,66 +1,74 @@
 <?php
-require_once 'conexion.php';
+require_once '../controlador/conexion.php';
 
-$disciplina_filtro = isset($_GET['disciplina']) ? $_GET['disciplina'] : '';
-$genero_filtro = isset($_GET['genero']) ? $_GET['genero'] : '';
-$categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+// Filtros GET
+$disciplina_filtro = isset($_GET['disciplina']) ? trim($_GET['disciplina']) : '';
+$genero_filtro = isset($_GET['genero']) ? trim($_GET['genero']) : '';
+$categoria_filtro = isset($_GET['categoria']) ? trim($_GET['categoria']) : '';
 
-$sql = "SELECT 
-            a.id, 
-            a.cedula, 
-            a.nombre, 
-            a.apellido, 
-            a.genero,
-            a.fecha_nacimiento,
-            a.comuna,
-            a.categoria,
-            a.estado,
-            r.nombre AS nombre_rep, 
-            r.apellido AS apellido_rep,
-            e.nombre AS nombre_ent, 
-            e.apellido AS apellido_ent,
-            d.nombre_disciplina AS disciplina
-        FROM atletas a
-        INNER JOIN representantes r ON a.representante_id = r.id
-        INNER JOIN entrenadores e ON a.entrenador_id = e.id
-        INNER JOIN disciplinas d ON a.disciplina_id = d.id WHERE 1=1";
+// 1. Paginación
+$limite = 10;
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina < 1) $pagina = 1;
+$inicio = ($pagina - 1) * $limite;
 
+// Construir cláusula WHERE dinámica
+$condiciones = [];
 $params = [];
-$types = "";
+$tipos = "";
 
 if (!empty($disciplina_filtro)) {
-    $sql .= " AND a.disciplina_id = ?";
+    $condiciones[] = "a.disciplina_id = ?";
     $params[] = $disciplina_filtro;
-    $types .= "i";
+    $tipos .= "i";
 }
-
 if (!empty($genero_filtro)) {
-    $sql .= " AND a.genero = ?";
+    $condiciones[] = "a.genero = ?";
     $params[] = $genero_filtro;
-    $types .= "s";
+    $tipos .= "s";
 }
-
 if (!empty($categoria_filtro)) {
-    $sql .= " AND a.categoria = ?";
+    $condiciones[] = "a.categoria = ?";
     $params[] = $categoria_filtro;
-    $types .= "s";
+    $tipos .= "s";
 }
 
-$sql .= " ORDER BY a.id DESC";
+$where_sql = count($condiciones) > 0 ? "WHERE " . implode(" AND ", $condiciones) : "";
 
-$stmt = $conexion->prepare($sql);
-
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
+// 2. Contar total de registros filtrados
+$sql_total = "SELECT COUNT(*) as total FROM atletas a $where_sql";
+$stmt_total = $conexion->prepare($sql_total);
+if (!empty($tipos)) {
+    $stmt_total->bind_param($tipos, ...$params);
 }
+$stmt_total->execute();
+$total_registros = $stmt_total->get_result()->fetch_assoc()['total'];
+$total_paginas = ceil($total_registros / $limite);
+$stmt_total->close();
 
-$stmt->execute();
-$resultado = $stmt->get_result();
+// 3. Consulta paginada de Atletas
+$sql_atletas = "SELECT a.id, a.cedula, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.comuna, a.categoria, a.estado,
+                       r.nombre AS nombre_rep, r.apellido AS apellido_rep,
+                       e.nombre AS nombre_ent, e.apellido AS apellido_ent,
+                       d.nombre_disciplina AS disciplina
+                FROM atletas a
+                LEFT JOIN representantes r ON a.representante_id = r.id
+                LEFT JOIN entrenadores e ON a.entrenador_id = e.id
+                LEFT JOIN disciplinas d ON a.disciplina_id = d.id
+                $where_sql
+                ORDER BY a.id DESC
+                LIMIT ? OFFSET ?";
 
-if (!$resultado) {
-    die("Error en la consulta: " . $conexion->error);
-}
+$params_atletas = $params;
+$params_atletas[] = $limite;
+$params_atletas[] = $inicio;
+$tipos_atletas = $tipos . "ii";
 
-$sql_disc = "SELECT id, nombre_disciplina FROM disciplinas";
-$resultado_disciplinas = $conexion->query($sql_disc);
+$stmt_atletas = $conexion->prepare($sql_atletas);
+$stmt_atletas->bind_param($tipos_atletas, ...$params_atletas);
+$stmt_atletas->execute();
+$resultado = $stmt_atletas->get_result();
+
+// Cargar disciplinas para el desplegable de filtros
+$resultado_disciplinas = $conexion->query("SELECT id, nombre_disciplina FROM disciplinas ORDER BY nombre_disciplina ASC");
 ?>

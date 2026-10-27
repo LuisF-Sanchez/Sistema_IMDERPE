@@ -40,16 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn_registrar'])) {
     if ($stmt->execute()) {
         $atleta_id = $stmt->insert_id;
 
-        $id_usuario = $_SESSION['usuario_id'] ?? null;
-        $accion = "REGISTRO_ATLETA";
-        $descripcion = "Se registró exitosamente al atleta '{$nombre} {$apellido}' (Cédula: {$cedula}) con ID: {$atleta_id}";
+        // Datos unificados para la bitácora idénticos al resto de módulos
+        $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Administrador');
+        $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
+        
+        $accion = "Registro de Atleta";
+        $cedula_txt = !empty($cedula) ? " (C.I. {$cedula})" : "";
+        $descripcion = "El {$rol} {$nombre_user} ha registrado al atleta {$nombre} {$apellido}{$cedula_txt}.";
         
         if (function_exists('registrar_bitacora')) {
-            registrar_bitacora($conexion, $id_usuario, $accion, $descripcion);
+            // Nota: Dependiendo de cómo reciba los parámetros tu función registrar_bitacora(), 
+            // asegúrate de pasarle los argumentos en el orden correcto que espera. 
+            // Si tu función global usa (conexion, accion, descripcion), pásalos así:
+            registrar_bitacora($conexion, $accion, $descripcion);
         }
 
         $stmt->close();
-        header("Location: ../vista/ver_atletas.php?msg=registrado");
+        header("Location: ../vista/ver_atletas.php?registro_exito=1");
         exit();
     } else {
         $stmt->close();
