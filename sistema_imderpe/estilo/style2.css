@@ -143,19 +143,27 @@ body {
 }
 
 .btn-logout-top {
-    background-color: #D32F2F;
     color: white;
     text-decoration: none;
-    padding: 8px 18px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-logout-top i {
+    color: white;
+    transition: color 0.3s ease;
 }
 
 .btn-logout-top:hover {
-    background-color: #A32424;
-    box-shadow: 0 0 10px rgba(211, 47, 47, 0.4);
+    color: #FBC02D;
+}
+
+.btn-logout-top:hover i {
+    color: #FBC02D;
 }
 
 .central-container {

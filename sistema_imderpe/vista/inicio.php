@@ -20,7 +20,7 @@ if (!isset($_SESSION['usuario_nombre'])) {
     <div class="header-container">
         <div class="welcome-text">
             <i class="fas fa-user-check"></i> 
-            Bienvenido <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?>
+            Bienvenido <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?> | Rol: <?php echo htmlspecialchars(ucfirst($_SESSION['usuario_tipo'] ?? 'Usuario')); ?>
         </div>        
         <nav class="nav-menu">
             <div class="dropdown">
@@ -64,7 +64,9 @@ if (!isset($_SESSION['usuario_nombre'])) {
                 <i class="fas fa-question-circle"></i> Ayuda
             </a>
             
-            <a href="../controlador/cerrar_sesion.php" class="btn-logout-top">Cerrar Sesión</a>
+            <a href="../controlador/cerrar_sesion.php" class="btn-logout-top">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
         </nav>
     </div>
 </header>

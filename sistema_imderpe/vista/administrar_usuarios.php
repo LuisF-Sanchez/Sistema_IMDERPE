@@ -169,6 +169,25 @@ include "../controlador/tabla_usuarios.php";
             });
             limpiarURL();
         <?php endif; ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] == 'auto_eliminacion'): ?>
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Acción No Permitida',
+                    text: 'No se puede eliminar a usted mismo.',
+                    icon: 'warning',
+                    timer: 4000,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    background: '#1D3D81',
+                    color: '#ffffff',
+                    iconColor: '#FBC02D'
+                });
+            } else {
+                alert('No se puede eliminar a usted mismo.');
+            }
+            limpiarURL();
+        <?php endif; ?>
     </script>
 </body>
 </html>
