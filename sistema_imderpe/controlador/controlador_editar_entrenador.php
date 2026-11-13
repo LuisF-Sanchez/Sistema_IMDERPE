@@ -5,6 +5,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'conexion.php';
 require_once 'registrar_bitacora.php';
 
+$pagina_actual = isset($_POST['pagina']) ? intval($_POST['pagina']) : (isset($_GET['pagina']) ? intval($_GET['pagina']) : 1);
+
 if (!empty($_POST["btn_editar"])) {
 
     $id = intval($_POST["id"] ?? 0);
@@ -18,7 +20,6 @@ if (!empty($_POST["btn_editar"])) {
 
     if (!empty($id) && !empty($cedula) && !empty($nombre) && !empty($apellido) && !empty($disciplina_id) && !empty($telefono) && !empty($correo)) {
         
-        // 1. Verificar Cédula duplicada
         $check_cedula = $conexion->prepare("SELECT id FROM entrenadores WHERE cedula = ? AND id <> ?");
         $check_cedula->bind_param("si", $cedula, $id);
         $check_cedula->execute();
@@ -26,12 +27,11 @@ if (!empty($_POST["btn_editar"])) {
 
         if ($res_cedula->num_rows > 0) {
             $check_cedula->close();
-            header("Location: ../vista/editar_entrenador.php?id={$id}&error=duplicado&campo=cedula");
+            header("Location: ../vista/editar_entrenador.php?id={$id}&pagina={$pagina_actual}&error=duplicado&campo=cedula");
             exit();
         }
         $check_cedula->close();
 
-        // 2. Verificar Teléfono duplicado
         $check_telefono = $conexion->prepare("SELECT id FROM entrenadores WHERE telefono = ? AND id <> ?");
         $check_telefono->bind_param("si", $telefono, $id);
         $check_telefono->execute();
@@ -39,12 +39,11 @@ if (!empty($_POST["btn_editar"])) {
 
         if ($res_telefono->num_rows > 0) {
             $check_telefono->close();
-            header("Location: ../vista/editar_entrenador.php?id={$id}&error=duplicado&campo=telefono");
+            header("Location: ../vista/editar_entrenador.php?id={$id}&pagina={$pagina_actual}&error=duplicado&campo=telefono");
             exit();
         }
         $check_telefono->close();
 
-        // 3. Verificar Correo duplicado
         $check_correo = $conexion->prepare("SELECT id FROM entrenadores WHERE correo = ? AND id <> ?");
         $check_correo->bind_param("si", $correo, $id);
         $check_correo->execute();
@@ -52,12 +51,11 @@ if (!empty($_POST["btn_editar"])) {
 
         if ($res_correo->num_rows > 0) {
             $check_correo->close();
-            header("Location: ../vista/editar_entrenador.php?id={$id}&error=duplicado&campo=correo");
+            header("Location: ../vista/editar_entrenador.php?id={$id}&pagina={$pagina_actual}&error=duplicado&campo=correo");
             exit();
         }
         $check_correo->close();
 
-        // Si todas las comprobaciones pasan, actualizar
         $sql = $conexion->prepare("UPDATE entrenadores SET cedula=?, nombre=?, apellido=?, disciplina_id=?, telefono=?, correo=?, estado=? WHERE id=?");
         $sql->bind_param("sssisssi", $cedula, $nombre, $apellido, $disciplina_id, $telefono, $correo, $estado, $id);
 
@@ -69,21 +67,21 @@ if (!empty($_POST["btn_editar"])) {
             registrar_bitacora($conexion, "Edición de Entrenador", $descripcion);
 
             $sql->close();
-            header("Location: ../vista/ver_entrenadores.php?edit_exito=1");
+            header("Location: ../vista/ver_entrenadores.php?edit_exito=1&pagina=" . $pagina_actual);
             exit();
         } else {
             $sql->close();
-            header("Location: ../vista/editar_entrenador.php?id={$id}&error=1");
+            header("Location: ../vista/editar_entrenador.php?id={$id}&pagina={$pagina_actual}&error=1");
             exit();
         }
 
     } else {
-        header("Location: ../vista/editar_entrenador.php?id={$id}&error_campos=1");
+        header("Location: ../vista/editar_entrenador.php?id={$id}&pagina={$pagina_actual}&error_campos=1");
         exit();
     }
 }
 
 $conexion->close();
-header("Location: ../vista/ver_entrenadores.php");
+header("Location: ../vista/ver_entrenadores.php?pagina=" . $pagina_actual);
 exit();
 ?>

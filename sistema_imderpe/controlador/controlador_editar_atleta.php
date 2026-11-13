@@ -5,6 +5,16 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once '../controlador/conexion.php';
 require_once '../controlador/registrar_bitacora.php';
 
+$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+$disciplina_filtro = isset($_GET['disciplina']) ? $_GET['disciplina'] : '';
+$genero_filtro = isset($_GET['genero']) ? $_GET['genero'] : '';
+$categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+
+$filtros_query = "";
+if (!empty($disciplina_filtro)) $filtros_query .= "&disciplina=" . urlencode($disciplina_filtro);
+if (!empty($genero_filtro)) $filtros_query .= "&genero=" . urlencode($genero_filtro);
+if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($categoria_filtro);
+
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']); 
     
@@ -12,7 +22,7 @@ if (isset($_GET['id'])) {
     $atleta = $sql_atleta->fetch_assoc();
 
     if (!$atleta) {
-        header("Location: ../vista/ver_atletas.php");
+        header("Location: ../vista/ver_atletas.php?pagina=" . $pagina_actual . $filtros_query);
         exit();
     }
 
@@ -35,11 +45,9 @@ if (!empty($_POST["btn_actualizar"])) {
     $disciplina_id = intval($_POST['disciplina_id']);
     $estado = $_POST['estado'];
 
-    // Validar si la cédula existe en otro registro
     $check_cedula = $conexion->query("SELECT id FROM atletas WHERE cedula = '$cedula' AND id != $id");
     if ($check_cedula->num_rows > 0) {
-        // CORRECCIÓN: Se envía el parámetro id para que no pierda la vista del formulario
-        header("Location: ../vista/editar_atleta.php?id=" . $id . "&error=duplicado&campo=cedula");
+        header("Location: ../vista/editar_atleta.php?id=" . $id . "&pagina=" . $pagina_actual . $filtros_query . "&error=duplicado&campo=cedula");
         exit();
     }
 
@@ -64,10 +72,10 @@ if (!empty($_POST["btn_actualizar"])) {
         $descripcion = "El {$rol} {$nombre_user} ha actualizado los datos del atleta {$nombre} {$apellido}{$cedula_txt}.";
         registrar_bitacora($conexion, "Edición de Atleta", $descripcion);
 
-        header("Location: ../vista/ver_atletas.php?edit_exito=1");
+        header("Location: ../vista/ver_atletas.php?edit_exito=1&pagina=" . $pagina_actual . $filtros_query);
         exit();
     } else {
-        header("Location: ../vista/ver_atletas.php?error=1");
+        header("Location: ../vista/ver_atletas.php?error=1&pagina=" . $pagina_actual . $filtros_query);
         exit();
     }
 }

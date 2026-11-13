@@ -8,26 +8,30 @@ if (!isset($_SESSION['usuario_nombre'])) {
 require_once '../controlador/conexion.php';
 
 $id_responsable = $_GET['id'] ?? '';
+$pagina_actual  = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 
 if (empty($id_responsable)) {
     header("Location: ver_autogobierno.php");
     exit();
 }
 
-$stmt =$conexion->prepare("SELECT nombre, apellido, cedula, telefono, correo, direccion, comuna FROM autogobierno WHERE id = ?");
-$stmt->bind_param("i", $id_responsable);$stmt->execute();
-$resultado =$stmt->get_result();
+$stmt = $conexion->prepare("SELECT nombre, apellido, cedula, telefono, correo, direccion, comuna FROM autogobierno WHERE id = ?");
+$stmt->bind_param("i", $id_responsable);
+$stmt->execute();
+$resultado = $stmt->get_result();
 
 if ($resultado->num_rows === 0) {
-    $stmt->close();$conexion->close();
-    header("Location: ver_autogobierno.php");
+    $stmt->close();
+    $conexion->close();
+    header("Location: ver_autogobierno.php?pagina={$pagina_actual}");
     exit();
 }
 
-$responsable = $resultado->fetch_assoc();$stmt->close();
+$responsable = $resultado->fetch_assoc();
+$stmt->close();
 
-$error_duplicado =$_GET['error'] ?? '';
-$campo_duplicado =$_GET['campo'] ?? '';
+$error_duplicado = $_GET['error'] ?? '';
+$campo_duplicado = $_GET['campo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -48,12 +52,14 @@ $campo_duplicado =$_GET['campo'] ?? '';
             <h2 class="form-title">Editar Responsable</h2>
             
             <input type="hidden" name="id" value="<?php echo $id_responsable; ?>">
+            <!-- Campo oculto para persistir la sección/página -->
+            <input type="hidden" name="pagina" value="<?php echo $pagina_actual; ?>">
 
             <div class="form-grid">
                 <div class="input-group">
                     <i class="fas fa-id-card"></i>
                     <input type="text" name="cedula" id="cedula" placeholder="Cédula de Identidad" autocomplete="off" value="<?php echo htmlspecialchars($responsable['cedula']); ?>">
-                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'cedula'): ?>
+                    <?php if ($error_duplicado === 'duplicado' && $campo_duplicado === 'cedula'): ?>
                         <span class="error-mensaje error-backend">* esta cédula ya existe</span>
                     <?php endif; ?>
                 </div>
@@ -71,7 +77,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
                 <div class="input-group">
                     <i class="fas fa-phone"></i>
                     <input type="text" name="telefono" id="telefono" placeholder="Número de Teléfono" autocomplete="off" value="<?php echo htmlspecialchars($responsable['telefono']); ?>">
-                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'telefono'): ?>
+                    <?php if ($error_duplicado === 'duplicado' && $campo_duplicado === 'telefono'): ?>
                         <span class="error-mensaje error-backend">* este teléfono ya existe</span>
                     <?php endif; ?>
                 </div>
@@ -79,7 +85,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
                 <div class="input-group">
                     <i class="fas fa-envelope"></i>
                     <input type="email" name="correo" id="correo" placeholder="Correo Electrónico" autocomplete="off" value="<?php echo htmlspecialchars($responsable['correo']); ?>">
-                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'correo'): ?>
+                    <?php if ($error_duplicado === 'duplicado' && $campo_duplicado === 'correo'): ?>
                         <span class="error-mensaje error-backend">* este correo ya existe</span>
                     <?php endif; ?>
                 </div>
@@ -99,7 +105,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
                 <button type="submit" name="btn_editar" value="ok" class="btn-update">
                     Actualizar Información
                 </button>
-                <a href="ver_autogobierno.php" class="btn-cancel">Cancelar y Volver</a>
+                <a href="ver_autogobierno.php?pagina=<?php echo $pagina_actual; ?>" class="btn-cancel">Cancelar y Volver</a>
             </div>
         </form>
     </div>
@@ -108,12 +114,10 @@ $campo_duplicado =$_GET['campo'] ?? '';
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('.glass-form');
 
-        // Limpia los parámetros de error de la URL
         if (window.location.search.includes('error=duplicado')) {
-            window.history.replaceState({}, document.title, window.location.pathname + '?id=<?php echo $id_responsable; ?>');
+            window.history.replaceState({}, document.title, window.location.pathname + '?id=<?php echo $id_responsable; ?>&pagina=<?php echo $pagina_actual; ?>');
         }
 
-        // Si vino marcado un error backend, resalta el input correspondientes
         const errorBackend = document.querySelector('.error-backend');
         if (errorBackend) {
             const inputDuplicado = errorBackend.closest('.input-group').querySelector('input');
@@ -135,10 +139,8 @@ $campo_duplicado =$_GET['campo'] ?? '';
             }
         });
 
-        // Validación frontend al enviar
         form.addEventListener('submit', function(e) {
             let hayError = false;
-
             form.querySelectorAll('.error-mensaje:not(.error-backend)').forEach(el => el.remove());
 
             todosLosInputs.forEach(campo => {
@@ -154,13 +156,10 @@ $campo_duplicado =$_GET['campo'] ?? '';
 
                     if (!parentGroup.querySelector('.error-mensaje-js')) {
                         let placeholderText = campo.getAttribute('placeholder') ? campo.getAttribute('placeholder').toLowerCase() : 'este campo';
-                        
                         let mensaje = `* Debe colocar ${placeholderText}`;
-
                         const msgError = document.createElement('span');
                         msgError.className = 'error-mensaje error-mensaje-js';
                         msgError.innerText = mensaje;
-
                         parentGroup.appendChild(msgError);
                     }
                 }

@@ -11,6 +11,10 @@ if (!isset($_SESSION['usuario_nombre'])) {
 require_once 'conexion.php';
 require_once 'registrar_bitacora.php';
 
+// Capturamos la sección actual (por defecto la 1 si no viene definida)
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina < 1) $pagina = 1;
+
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
     
@@ -24,20 +28,18 @@ if (isset($_GET['id'])) {
         $usuario_info = "{$row['nombre']}" . (!empty($row['cedula']) ? " (C.I. {$row['cedula']})" : "");
     } else {
         $stmt_get->close();
-        header("Location: ../vista/administrar_usuarios.php?error=no_encontrado");
+        header("Location: ../vista/administrar_usuarios.php?pagina={$pagina}&error=no_encontrado");
         exit();
     }
     $stmt_get->close();
-
 
     $current_user_name = $_SESSION['usuario_nombre'] ?? '';
     $current_user_id = $_SESSION['usuario_id'] ?? 0;
 
     if ($id === $current_user_id || strcasecmp(trim($nombre_a_borrar), trim($current_user_name)) === 0) {
-        header("Location: ../vista/administrar_usuarios.php?error=auto_eliminacion");
+        header("Location: ../vista/administrar_usuarios.php?pagina={$pagina}&error=auto_eliminacion");
         exit();
     }
-
 
     $sql = "DELETE FROM usuarios WHERE id = ?";
     $stmt = $conexion->prepare($sql);
@@ -53,15 +55,16 @@ if (isset($_GET['id'])) {
         }
 
         $stmt->close();
-        header("Location: ../vista/administrar_usuarios.php?eliminar_exito=ok");
+
+        header("Location: ../vista/administrar_usuarios.php?pagina={$pagina}&eliminar_exito=ok");
         exit();
     } else {
         $stmt->close();
-        header("Location: ../vista/administrar_usuarios.php?error_eliminar=ok");
+        header("Location: ../vista/administrar_usuarios.php?pagina={$pagina}&error_eliminar=ok");
         exit();
     }
 } else {
-    header("Location: ../vista/administrar_usuarios.php");
+    header("Location: ../vista/administrar_usuarios.php?pagina={$pagina}");
     exit();
 }
 ?>

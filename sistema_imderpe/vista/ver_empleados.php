@@ -18,17 +18,14 @@ require_once '../controlador/controlador_empleados.php';
                 <i class="fas fa-arrow-left"></i> Volver al Inicio
             </a>
 
-            <!-- APARTADO DE NÚMEROS / PAGINACIÓN EN EL ENCABEZADO -->
             <?php if ($total_paginas > 1): ?>
                 <div class="paginacion-header">
-                    <!-- Flecha Anterior -->
                     <?php if ($pagina > 1): ?>
                         <a href="ver_empleados.php?pagina=<?php echo $pagina - 1; ?>" class="num-box nav-arrow" title="Página Anterior">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                     <?php endif; ?>
 
-                    <!-- Cálculo de rango de 5 números máximo -->
                     <?php 
                         $max_visibles = 5;
                         $inicio_num = max(1, $pagina - floor($max_visibles / 2));
@@ -45,7 +42,6 @@ require_once '../controlador/controlador_empleados.php';
                         </a>
                     <?php endfor; ?>
 
-                    <!-- Flecha Siguiente -->
                     <?php if ($pagina < $total_paginas): ?>
                         <a href="ver_empleados.php?pagina=<?php echo $pagina + 1; ?>" class="num-box nav-arrow" title="Página Siguiente">
                             <i class="fas fa-chevron-right"></i>
@@ -149,16 +145,16 @@ require_once '../controlador/controlador_empleados.php';
                                 </td>
                                 <td class="action-cell">
                                     <div class="action-buttons-wrapper">
-                                        <a href="editar_empleado.php?id=<?php echo $row['id']; ?>" class="btn-table edit">
+                                        <a href="editar_empleado.php?id=<?php echo $row['id']; ?>&pagina=<?php echo $pagina; ?>" class="btn-table edit">
                                             <i class="fas fa-edit"></i> Editar
                                         </a>
                                         
                                         <?php if ($row['estado'] == 'activo'): ?>
-                                            <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=activo" class="btn-inactivar">
+                                            <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=activo&pagina=<?php echo $pagina; ?>" class="btn-inactivar">
                                                 <i class="fas fa-user-slash"></i> Inactivar
                                             </a>
                                         <?php else: ?>
-                                            <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=inactivo" class="btn-activar">
+                                            <a href="../controlador/controlador_estado_empleado.php?id=<?php echo $row['id']; ?>&actual=inactivo&pagina=<?php echo $pagina; ?>" class="btn-activar">
                                                 <i class="fas fa-user-check"></i> Activar
                                             </a>
                                         <?php endif; ?>

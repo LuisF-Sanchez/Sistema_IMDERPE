@@ -2,11 +2,12 @@
 session_start();
 require_once '../controlador/controlador_atletas.php';
 
-// Armar los parámetros de los filtros para mantenerlos en los enlaces de la paginación
 $filtros_query = "";
 if (!empty($disciplina_filtro)) $filtros_query .= "&disciplina=" . urlencode($disciplina_filtro);
 if (!empty($genero_filtro)) $filtros_query .= "&genero=" . urlencode($genero_filtro);
 if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($categoria_filtro);
+
+$query_paginacion = $filtros_query . (!empty($filtros_query) ? "&pagina=" : "?pagina=");
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -15,7 +16,7 @@ if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($cate
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Atletas - IMDERPE</title>
     <link rel="stylesheet" href="../estilo/style8.css">
-    <link rel="stylesheet" href="../estilo/style5.css"> <!-- Para heredar .paginacion-header y .num-box -->
+    <link rel="stylesheet" href="../estilo/style5.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -25,17 +26,14 @@ if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($cate
                 <i class="fas fa-arrow-left"></i> Volver al Inicio
             </a>
 
-            <!-- APARTADO DE NÚMEROS / PAGINACIÓN EN EL ENCABEZADO -->
             <?php if (isset($total_paginas) && $total_paginas > 1): ?>
                 <div class="paginacion-header">
-                    <!-- Flecha Anterior -->
                     <?php if ($pagina > 1): ?>
-                        <a href="ver_atletas.php?pagina=<?php echo $pagina - 1 . $filtros_query; ?>" class="num-box nav-arrow" title="Página Anterior">
+                        <a href="ver_atletas.php?pagina=<?php echo ($pagina - 1) . $filtros_query; ?>" class="num-box nav-arrow" title="Página Anterior">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                     <?php endif; ?>
 
-                    <!-- Cálculo de rango giratorio de hasta 5 números visibles -->
                     <?php 
                         $max_visibles = 5;
                         $inicio_num = max(1, $pagina - floor($max_visibles / 2));
@@ -52,9 +50,8 @@ if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($cate
                         </a>
                     <?php endfor; ?>
 
-                    <!-- Flecha Siguiente -->
                     <?php if ($pagina < $total_paginas): ?>
-                        <a href="ver_atletas.php?pagina=<?php echo $pagina + 1 . $filtros_query; ?>" class="num-box nav-arrow" title="Página Siguiente">
+                        <a href="ver_atletas.php?pagina=<?php echo ($pagina + 1) . $filtros_query; ?>" class="num-box nav-arrow" title="Página Siguiente">
                             <i class="fas fa-chevron-right"></i>
                         </a>
                     <?php endif; ?>
@@ -148,16 +145,16 @@ if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($cate
                                     <span class="badge-estado <?php echo $clase; ?>"><?php echo ucfirst($row['estado']); ?></span>
                                 </td>
                                 <td class="action-cell">
-                                    <a href="editar_atleta.php?id=<?php echo $row['id']; ?>" class="btn-table edit" title="Editar Atleta">
+                                    <a href="editar_atleta.php?id=<?php echo $row['id']; ?>&pagina=<?php echo $pagina; ?><?php echo $filtros_query; ?>" class="btn-table edit" title="Editar Atleta">
                                         <i class="fas fa-edit"></i> Editar
                                     </a>
                                     
                                     <?php if ($row['estado'] == 'activo'): ?>
-                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=activo" class="btn-inactivar" title="Inactivar">
+                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=activo&pagina=<?php echo $pagina; ?><?php echo $filtros_query; ?>" class="btn-inactivar" title="Inactivar">
                                             <i class="fas fa-user-slash"></i> Inactivar
                                         </a>
                                     <?php else: ?>
-                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=inactivo" class="btn-activar" title="Activar">
+                                        <a href="../controlador/controlador_estado_atleta.php?id=<?php echo $row['id']; ?>&actual=inactivo&pagina=<?php echo $pagina; ?><?php echo $filtros_query; ?>" class="btn-activar" title="Activar">
                                             <i class="fas fa-user-check"></i> Activar
                                         </a>
                                     <?php endif; ?>

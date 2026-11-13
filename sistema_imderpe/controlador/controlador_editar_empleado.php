@@ -7,6 +7,7 @@ require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id            = intval($_POST['id']);
+    $pagina        = isset($_POST['pagina']) ? intval($_POST['pagina']) : 1;
     $cedula        = trim($_POST['cedula']);
     $nombre        = trim($_POST['nombre']);
     $apellido      = trim($_POST['apellido']);
@@ -21,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check->execute();
     if ($check->get_result()->num_rows > 0) {
         $check->close();
-        header("Location: ../vista/editar_empleado.php?id={$id}&error=duplicado&campo=cedula");
+        header("Location: ../vista/editar_empleado.php?id={$id}&pagina={$pagina}&error=duplicado&campo=cedula");
         exit();
     }
     $check->close();
@@ -31,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check->execute();
     if ($check->get_result()->num_rows > 0) {
         $check->close();
-        header("Location: ../vista/editar_empleado.php?id={$id}&error=duplicado&campo=telefono");
+        header("Location: ../vista/editar_empleado.php?id={$id}&pagina={$pagina}&error=duplicado&campo=telefono");
         exit();
     }
     $check->close();
@@ -41,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check->execute();
     if ($check->get_result()->num_rows > 0) {
         $check->close();
-        header("Location: ../vista/editar_empleado.php?id={$id}&error=duplicado&campo=correo");
+        header("Location: ../vista/editar_empleado.php?id={$id}&pagina={$pagina}&error=duplicado&campo=correo");
         exit();
     }
     $check->close();
@@ -78,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $descripcion = "El {$rol} {$nombre_user} ha actualizado los datos del empleado {$nombre} {$apellido}{$cedula_txt}.";
         registrar_bitacora($conexion, "Edición de Empleado", $descripcion);
 
-        header("Location: ../vista/ver_empleados.php?edit_exito=true");
+        header("Location: ../vista/ver_empleados.php?edit_exito=true&pagina={$pagina}");
         exit();
     } else {
         echo "Error al actualizar los datos: " . $stmt->error;

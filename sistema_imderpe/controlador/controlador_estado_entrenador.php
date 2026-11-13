@@ -5,6 +5,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'conexion.php';
 require_once 'registrar_bitacora.php';
 
+$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+
 if (isset($_GET['id']) && isset($_GET['actual'])) {
     $id = intval($_GET['id']);
     $estado_actual = $_GET['actual'];
@@ -33,16 +35,16 @@ if (isset($_GET['id']) && isset($_GET['actual'])) {
         $descripcion = "El {$rol} {$nombre_user} ha cambiado el estado del entrenador {$persona_info} a '{$nuevo_estado}'.";
         registrar_bitacora($conexion, "Cambio de Estado Entrenador", $descripcion);
 
-        header("Location: ../vista/ver_entrenadores.php?estado_exito=1");
+        header("Location: ../vista/ver_entrenadores.php?estado_exito=1&pagina=" . $pagina_actual);
         exit();
     } else {
-        header("Location: ../vista/ver_entrenadores.php?error=1");
+        header("Location: ../vista/ver_entrenadores.php?error=1&pagina=" . $pagina_actual);
         exit();
     }
 
     $stmt->close();
 } else {
-    header("Location: ../vista/ver_entrenadores.php");
+    header("Location: ../vista/ver_entrenadores.php?pagina=" . $pagina_actual);
     exit();
 }
 

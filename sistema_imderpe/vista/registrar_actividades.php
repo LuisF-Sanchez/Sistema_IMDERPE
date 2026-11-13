@@ -6,13 +6,13 @@ if (!isset($_SESSION['usuario_nombre'])) {
 }
 require_once '../controlador/conexion.php';
 
-$res_empleados =$conexion->query("SELECT id, nombre, apellido, cargo FROM empleados WHERE estado = 'activo' ORDER BY nombre ASC");
-$res_tipos =$conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER BY nombre_tipo ASC");
+$res_empleados = $conexion->query("SELECT id, nombre, apellido, cargo FROM empleados WHERE estado = 'activo' ORDER BY nombre ASC");
+$res_tipos = $conexion->query("SELECT id, nombre_tipo FROM tipos_actividad ORDER BY nombre_tipo ASC");
 
 $empleados_array = [];
-if ($res_empleados &&$res_empleados->num_rows > 0) {
-    while($e =$res_empleados->fetch_assoc()) {
-        $empleados_array[] =$e;
+if ($res_empleados && $res_empleados->num_rows > 0) {
+    while($e = $res_empleados->fetch_assoc()) {
+        $empleados_array[] = $e;
     }
 }
 ?>
@@ -25,6 +25,40 @@ if ($res_empleados &&$res_empleados->num_rows > 0) {
     <title>Registrar Actividad - IMDERPE</title>
     <link rel="stylesheet" href="../estilo/style14.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Corrección de diseño para garantizar la barra de desplazamiento vertical */
+        html, body {
+            height: auto !important;
+            min-height: 100vh;
+            overflow-y: auto !important;
+        }
+        body {
+            display: block !important;
+        }
+        .login-container {
+            height: auto !important;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+        /* Estética personalizada para la barra de desplazamiento */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(251, 192, 45, 0.7);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(251, 192, 45, 1);
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -56,8 +90,8 @@ if ($res_empleados &&$res_empleados->num_rows > 0) {
                     <i class="fas fa-layer-group"></i>
                     <select name="tipo_id" id="tipo_id">
                         <option value="" disabled selected>Seleccione Tipo de Actividad</option>
-                        <?php if($res_tipos &&$res_tipos->num_rows > 0): ?>
-                            <?php foreach($res_tipos as$t): ?>
+                        <?php if($res_tipos && $res_tipos->num_rows > 0): ?>
+                            <?php foreach($res_tipos as $t): ?>
                                 <option value="<?php echo $t['id']; ?>">
                                     <?php echo htmlspecialchars($t['nombre_tipo']); ?>
                                 </option>
@@ -84,7 +118,7 @@ if ($res_empleados &&$res_empleados->num_rows > 0) {
                                 <i class="fas fa-user-shield"></i>
                                 <select name="empleado_id[]" disabled class="select-responsable">
                                     <option value="" disabled selected>Primero seleccione una actividad...</option>
-                                    <?php foreach($empleados_array as$e): ?>
+                                    <?php foreach($empleados_array as $e): ?>
                                         <option value="<?php echo $e['id']; ?>">
                                             <?php echo htmlspecialchars($e['nombre'] . " " . $e['apellido'] . " - " . $e['cargo']); ?>
                                         </option>

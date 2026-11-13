@@ -11,6 +11,8 @@ if (!isset($_SESSION['usuario_nombre'])) {
 require_once 'conexion.php';
 require_once 'registrar_bitacora.php';
 
+$pagina_actual = isset($_POST['pagina']) ? intval($_POST['pagina']) : (isset($_GET['pagina']) ? intval($_GET['pagina']) : 1);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $id = intval($_POST['id']);
@@ -21,44 +23,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = trim($_POST['correo']);
     $direccion = trim($_POST['direccion']);
 
-    // 1. Validar CÉDULA duplicada
     $check_cedula = $conexion->prepare("SELECT id FROM representantes WHERE cedula = ? AND id <> ?");
     $check_cedula->bind_param("si", $cedula, $id);
     $check_cedula->execute();
     if ($check_cedula->get_result()->num_rows > 0) {
         $check_cedula->close();
-        header("Location: ../vista/editar_representante.php?id={$id}&error=duplicado&campo=cedula");
+        header("Location: ../vista/editar_representante.php?id={$id}&pagina={$pagina_actual}&error=duplicado&campo=cedula");
         exit();
     }
     $check_cedula->close();
 
-    // 2. Validar TELÉFONO duplicado
     if (!empty($telefono)) {
         $check_telefono = $conexion->prepare("SELECT id FROM representantes WHERE telefono = ? AND id <> ?");
         $check_telefono->bind_param("si", $telefono, $id);
         $check_telefono->execute();
         if ($check_telefono->get_result()->num_rows > 0) {
             $check_telefono->close();
-            header("Location: ../vista/editar_representante.php?id={$id}&error=duplicado&campo=telefono");
+            header("Location: ../vista/editar_representante.php?id={$id}&pagina={$pagina_actual}&error=duplicado&campo=telefono");
             exit();
         }
         $check_telefono->close();
     }
 
-    // 3. Validar CORREO duplicado
     if (!empty($correo)) {
         $check_correo = $conexion->prepare("SELECT id FROM representantes WHERE correo = ? AND id <> ?");
         $check_correo->bind_param("si", $correo, $id);
         $check_correo->execute();
         if ($check_correo->get_result()->num_rows > 0) {
             $check_correo->close();
-            header("Location: ../vista/editar_representante.php?id={$id}&error=duplicado&campo=correo");
+            header("Location: ../vista/editar_representante.php?id={$id}&pagina={$pagina_actual}&error=duplicado&campo=correo");
             exit();
         }
         $check_correo->close();
     }
 
-    // Actualizar datos del representante
     $update_sql = "UPDATE representantes SET cedula = ?, nombre = ?, apellido = ?, telefono = ?, correo = ?, direccion = ? WHERE id = ?";
     $stmt_update = $conexion->prepare($update_sql);
     $stmt_update->bind_param("ssssssi", $cedula, $nombre, $apellido, $telefono, $correo, $direccion, $id);
@@ -71,15 +69,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         registrar_bitacora($conexion, "Edición de Representante", $descripcion);
 
         $stmt_update->close();
-        header("Location: ../vista/ver_representantes.php?edit_exito=ok");
+        header("Location: ../vista/ver_representantes.php?edit_exito=ok&pagina=" . $pagina_actual);
         exit();
     } else {
         $stmt_update->close();
-        header("Location: ../vista/ver_representantes.php?error_general=ok");
+        header("Location: ../vista/ver_representantes.php?error_general=ok&pagina=" . $pagina_actual);
         exit();
     }
 } else {
-    header("Location: ../vista/ver_representantes.php");
+    header("Location: ../vista/ver_representantes.php?pagina=" . $pagina_actual);
     exit();
 }
 ?>

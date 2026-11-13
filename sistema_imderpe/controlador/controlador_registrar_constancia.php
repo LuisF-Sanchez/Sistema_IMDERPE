@@ -59,10 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn_generar'])) {
     $pdf->AddPage();
     $pdf->SetMargins(20, 30, 20);
 
-    $pdf->Ln(15);
+    $pdf->Ln(8);
     $pdf->SetFont('Arial', 'B', 18);
     $pdf->SetTextColor(29, 61, 129);
     $pdf->Cell(0, 10, utf8_decode('CONSTANCIA DE PARTICIPACIÓN'), 0, 1, 'C');
+    $pdf->Ln(2);
+
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetTextColor(90, 90, 90);
+    $pdf->Cell(0, 5, utf8_decode('REPÚBLICA BOLIVARIANA DE VENEZUELA'), 0, 1, 'C');
     $pdf->Ln(10);
 
     $meses = [

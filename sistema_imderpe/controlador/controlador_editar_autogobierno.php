@@ -8,6 +8,7 @@ require_once 'registrar_bitacora.php';
 if (isset($_POST['btn_editar'])) {
     
     $id        = intval($_POST['id'] ?? 0);
+    $pagina    = intval($_POST['pagina'] ?? 1); // Recuperamos la sección actual
     $nombre    = trim($_POST['nombre'] ?? '');
     $apellido  = trim($_POST['apellido'] ?? '');
     $cedula    = trim($_POST['cedula'] ?? '');
@@ -27,7 +28,7 @@ if (isset($_POST['btn_editar'])) {
         if ($res_cedula->num_rows > 0) {
             $check_cedula->close();
             $conexion->close();
-            header("Location: ../vista/editar_autogobierno.php?id={$id}&error=duplicado&campo=cedula");
+            header("Location: ../vista/editar_autogobierno.php?id={$id}&pagina={$pagina}&error=duplicado&campo=cedula");
             exit();
         }
         $check_cedula->close();
@@ -41,7 +42,7 @@ if (isset($_POST['btn_editar'])) {
         if ($res_telefono->num_rows > 0) {
             $check_telefono->close();
             $conexion->close();
-            header("Location: ../vista/editar_autogobierno.php?id={$id}&error=duplicado&campo=telefono");
+            header("Location: ../vista/editar_autogobierno.php?id={$id}&pagina={$pagina}&error=duplicado&campo=telefono");
             exit();
         }
         $check_telefono->close();
@@ -55,7 +56,7 @@ if (isset($_POST['btn_editar'])) {
         if ($res_correo->num_rows > 0) {
             $check_correo->close();
             $conexion->close();
-            header("Location: ../vista/editar_autogobierno.php?id={$id}&error=duplicado&campo=correo");
+            header("Location: ../vista/editar_autogobierno.php?id={$id}&pagina={$pagina}&error=duplicado&campo=correo");
             exit();
         }
         $check_correo->close();
@@ -77,18 +78,19 @@ if (isset($_POST['btn_editar'])) {
 
             $stmt_update->close();
             $conexion->close();
-            header("Location: ../vista/ver_autogobierno.php?edit_exito=1");
+
+            header("Location: ../vista/ver_autogobierno.php?pagina={$pagina}&edit_exito=1");
             exit();
         } else {
             $stmt_update->close();
             $conexion->close();
-            header("Location: ../vista/editar_autogobierno.php?id={$id}&error_db=1");
+            header("Location: ../vista/editar_autogobierno.php?id={$id}&pagina={$pagina}&error_db=1");
             exit();
         }
 
     } else {
         $conexion->close();
-        header("Location: ../vista/editar_autogobierno.php?id={$id}&error_campos=1");
+        header("Location: ../vista/editar_autogobierno.php?id={$id}&pagina={$pagina}&error_campos=1");
         exit();
     }
 } else {

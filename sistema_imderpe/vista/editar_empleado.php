@@ -7,21 +7,25 @@ if (!isset($_SESSION['usuario_nombre'])) {
     exit();
 }
 
-if (isset($_GET['id'])) {$id = intval($_GET['id']);$sql = "SELECT * FROM empleados WHERE id = $id";
+$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $sql = "SELECT * FROM empleados WHERE id = $id";
     $resultado = $conexion->query($sql);
-    $empleado =$resultado->fetch_assoc();
+    $empleado = $resultado->fetch_assoc();
 
     if (!$empleado) {
-        header("Location: ver_empleados.php");
+        header("Location: ver_empleados.php?pagina=" . $pagina_actual);
         exit();
     }
 } else {
-    header("Location: ver_empleados.php");
+    header("Location: ver_empleados.php?pagina=" . $pagina_actual);
     exit();
 }
 
-$error_duplicado =$_GET['error'] ?? '';
-$campo_duplicado =$_GET['campo'] ?? '';
+$error_duplicado = $_GET['error'] ?? '';
+$campo_duplicado = $_GET['campo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -41,12 +45,13 @@ $campo_duplicado =$_GET['campo'] ?? '';
             <h2 class="form-title">Editar Empleado</h2>
 
             <input type="hidden" name="id" value="<?php echo $empleado['id']; ?>">
+            <input type="hidden" name="pagina" value="<?php echo $pagina_actual; ?>">
 
             <div class="form-grid">
                 <div class="input-group">
                     <i class="fas fa-id-card"></i>
                     <input type="text" name="cedula" value="<?php echo htmlspecialchars($empleado['cedula']); ?>" placeholder="Cédula de Identidad">
-                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'cedula'): ?>
+                    <?php if ($error_duplicado === 'duplicado' && $campo_duplicado === 'cedula'): ?>
                         <span class="error-mensaje error-backend">* La cédula ya existe en el sistema</span>
                     <?php endif; ?>
                 </div>
@@ -90,7 +95,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
                 <div class="input-group">
                     <i class="fas fa-phone"></i>
                     <input type="text" name="telefono" value="<?php echo htmlspecialchars($empleado['telefono']); ?>" placeholder="Número de Teléfono">
-                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'telefono'): ?>
+                    <?php if ($error_duplicado === 'duplicado' && $campo_duplicado === 'telefono'): ?>
                         <span class="error-mensaje error-backend">* Este número ya existe en el sistema</span>
                     <?php endif; ?>
                 </div>
@@ -98,7 +103,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
                 <div class="input-group">
                     <i class="fas fa-envelope"></i>
                     <input type="email" name="correo" value="<?php echo htmlspecialchars($empleado['correo']); ?>" placeholder="Correo Electrónico">
-                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'correo'): ?>
+                    <?php if ($error_duplicado === 'duplicado' && $campo_duplicado === 'correo'): ?>
                         <span class="error-mensaje error-backend">* Este correo ya existe en el sistema</span>
                     <?php endif; ?>
                 </div>
@@ -122,7 +127,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
 
             <div class="action-row">
                 <button type="submit" class="btn-update">Actualizar Información</button>
-                <a href="ver_empleados.php" class="btn-cancel">Cancelar y Volver</a>
+                <a href="ver_empleados.php?pagina=<?php echo $pagina_actual; ?>" class="btn-cancel">Cancelar y Volver</a>
             </div>
         </form>
     </div>
@@ -132,7 +137,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
         const form = document.querySelector('.glass-form');
 
         if (window.location.search.includes('error=duplicado')) {
-            window.history.replaceState({}, document.title, window.location.pathname + '?id=<?php echo $empleado['id']; ?>');
+            window.history.replaceState({}, document.title, window.location.pathname + '?id=<?php echo $empleado['id']; ?>&pagina=<?php echo $pagina_actual; ?>');
         }
 
         const errorBackend = document.querySelector('.error-backend');

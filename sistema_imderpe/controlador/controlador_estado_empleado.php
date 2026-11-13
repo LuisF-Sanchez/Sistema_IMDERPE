@@ -5,6 +5,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once '../controlador/conexion.php';
 require_once '../controlador/registrar_bitacora.php';
 
+$pagina = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+
 if (isset($_GET['id']) && isset($_GET['actual'])) {
     $id = intval($_GET['id']);
     $estado_actual = $_GET['actual'];
@@ -32,10 +34,14 @@ if (isset($_GET['id']) && isset($_GET['actual'])) {
         $descripcion = "El {$rol} {$nombre_user} ha cambiado el estado del empleado {$persona_info} a '{$nuevo_estado}'.";
         registrar_bitacora($conexion, "Cambio de Estado Empleado", $descripcion);
 
-        header("Location: ../vista/ver_empleados.php?cambio=" . $nuevo_estado);
+        header("Location: ../vista/ver_empleados.php?cambio=" . $nuevo_estado . "&pagina=" . $pagina);
+        exit();
     } else {
         echo "Error actualizando estado: " . $conexion->error;
     }
+} else {
+    header("Location: ../vista/ver_empleados.php?pagina=" . $pagina);
+    exit();
 }
 $conexion->close();
 ?>

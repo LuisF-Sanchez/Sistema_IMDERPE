@@ -1,5 +1,6 @@
 <?php
 session_start();
+$tiene_error = isset($_SESSION['error_login']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,16 +18,16 @@ session_start();
     <canvas id="burbujasCanvas"></canvas>
 
     <div class="login-container">
-        <div class="login-box" id="balatroCard">
+        <div class="login-box <?php echo $tiene_error ? 'revelar-formulario' : ''; ?>" id="balatroCard">
             <div class="card-glare"></div>
 
-            <h1 class="sistema-titulo">SISGAPDIM</h1>
+            <h1 class="sistema-titulo">SISGAPIM</h1>
 
             <div class="logo"></div>
             
             <h2>Acceso al Sistema</h2>
 
-            <?php if (isset($_SESSION['error_login'])): ?>
+            <?php if ($tiene_error): ?>
                 <div class="error-banner">
                     <i class="fas fa-exclamation-circle"></i>
                     <span>
@@ -38,21 +39,23 @@ session_start();
                 </div>
             <?php endif; ?>
 
-            <form action="../controlador/iniciar_sesion.php" method="POST" id="loginForm">
+            <form action="../controlador/iniciar_sesion.php" method="POST" id="loginForm" novalidate>
                 <div class="input-group">
                     <label for="email">Correo Electrónico</label>
                     <div class="input-wrapper">
                         <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="email" name="email" placeholder="ejemplo123@correo.com" required autocomplete="off">
+                        <input type="email" id="email" name="email" placeholder="ejemplo123@correo.com" autocomplete="off">
                     </div>
+                    <span class="error-msg" id="errorEmail" style="color: #ff6b6b; font-size: 0.8rem; margin-top: 4px; display: block;"></span>
                 </div>
                 
                 <div class="input-group">
                     <label for="password">Contraseña</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <input type="password" id="password" name="password" placeholder="••••••••">
                     </div>
+                    <span class="error-msg" id="errorPassword" style="color: #ff6b6b; font-size: 0.8rem; margin-top: 4px; display: block;"></span>
                 </div>
                 
                 <button type="submit" class="btn-login" id="btnSubmit">
@@ -128,9 +131,13 @@ session_start();
 
     document.addEventListener('DOMContentLoaded', () => {
         const card = document.getElementById('balatroCard');
-        setTimeout(() => {
-            card.classList.add('revelar-formulario');
-        }, 3000);
+        const tieneError = <?php echo $tiene_error ? 'true' : 'false'; ?>;
+        
+        if (!tieneError) {
+            setTimeout(() => {
+                card.classList.add('revelar-formulario');
+            }, 3000);
+        }
     });
 
     const card = document.getElementById('balatroCard');
@@ -161,7 +168,33 @@ session_start();
         glare.style.background = 'none';
     });
 
-    document.getElementById('loginForm').addEventListener('submit', function() {
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        const errorEmail = document.getElementById('errorEmail');
+        const errorPassword = document.getElementById('errorPassword');
+        
+        errorEmail.textContent = '';
+        errorPassword.textContent = '';
+        
+        let valido = true;
+
+        if (email === '') {
+            errorEmail.textContent = '* Debe colocar un correo';
+            valido = false;
+        }
+
+        if (password === '') {
+            errorPassword.textContent = '* Debe colocar una contraseña';
+            valido = false;
+        }
+
+        if (!valido) {
+            e.preventDefault();
+            return;
+        }
+
         document.getElementById('btnSubmit').classList.add('loading');
     });
 

@@ -5,6 +5,16 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once '../controlador/conexion.php'; 
 require_once '../controlador/registrar_bitacora.php';
 
+$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+$disciplina_filtro = isset($_GET['disciplina']) ? $_GET['disciplina'] : '';
+$genero_filtro = isset($_GET['genero']) ? $_GET['genero'] : '';
+$categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+
+$filtros_query = "";
+if (!empty($disciplina_filtro)) $filtros_query .= "&disciplina=" . urlencode($disciplina_filtro);
+if (!empty($genero_filtro)) $filtros_query .= "&genero=" . urlencode($genero_filtro);
+if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($categoria_filtro);
+
 if (isset($_GET['id']) && isset($_GET['actual'])) {
     $id = intval($_GET['id']);
     $estado_actual = $_GET['actual'];
@@ -33,14 +43,14 @@ if (isset($_GET['id']) && isset($_GET['actual'])) {
         $descripcion = "El {$rol} {$nombre_user} ha cambiado el estado del atleta {$persona_info} a '{$nuevo_estado}'.";
         registrar_bitacora($conexion, "Cambio de Estado Atleta", $descripcion);
 
-        header("Location: ../vista/ver_atletas.php?estado_exito=1");
+        header("Location: ../vista/ver_atletas.php?estado_exito=1&pagina=" . $pagina_actual . $filtros_query);
     } else {
-        header("Location: ../vista/ver_atletas.php?error=1");
+        header("Location: ../vista/ver_atletas.php?error=1&pagina=" . $pagina_actual . $filtros_query);
     }
     
     $stmt->close();
     $conexion->close();
 } else {
-    header("Location: ../vista/ver_atletas.php");
+    header("Location: ../vista/ver_atletas.php?pagina=" . $pagina_actual . $filtros_query);
 }
 ?>

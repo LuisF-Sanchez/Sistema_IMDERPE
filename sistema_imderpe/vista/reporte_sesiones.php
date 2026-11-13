@@ -302,29 +302,19 @@ $res_tabla = $conexion->query($query_tabla);
 
         const ctx = canvas.getContext('2d');
 
-        const listaColores = [
-            'rgba(251, 192, 45, 0.7)',
-            'rgba(40, 167, 69, 0.7)',
-            'rgba(23, 162, 184, 0.7)',
-            'rgba(0, 123, 255, 0.7)',
-            'rgba(153, 102, 255, 0.7)',
-            'rgba(220, 53, 69, 0.7)',
-            'rgba(255, 193, 7, 0.7)'
-        ];
-        const listaBordes = ['#FBC02D', '#28a745', '#17a2b8', '#007bff', '#9966ff', '#dc3545', '#ffc107'];
-
+        // Configuración de colores tecnológicos azules unificados
         let bgColores = finalData.map((_, i) => {
             if (accionActual && finalLabels[i] === accionActual) {
-                return listaColores[i % listaColores.length].replace('0.7', '0.95');
+                return 'rgba(0, 210, 255, 0.65)'; // Azul celeste más intenso si está seleccionado
             }
-            return accionActual ? listaColores[i % listaColores.length].replace('0.7', '0.15') : listaColores[i % listaColores.length];
+            return 'rgba(0, 150, 255, 0.25)'; // Fondo del rectángulo: azul menos intenso (translúcido)
         });
 
         let bdColores = finalData.map((_, i) => {
             if (accionActual && finalLabels[i] === accionActual) {
-                return listaBordes[i % listaBordes.length];
+                return '#ffffff'; // Blanco brillante si está seleccionado
             }
-            return accionActual ? 'rgba(255, 255, 255, 0.05)' : listaBordes[i % listaBordes.length];
+            return '#00d2ff'; // Borde azul celeste tecnológico para todas las barras
         });
 
         const miGrafica = new Chart(ctx, {
@@ -336,8 +326,8 @@ $res_tabla = $conexion->query($query_tabla);
                     data: finalData,
                     backgroundColor: bgColores,
                     borderColor: bdColores,
-                    borderWidth: 1.5,
-                    borderRadius: 5
+                    borderWidth: 2,
+                    borderRadius: 6
                 }]
             },
             options: {
@@ -345,7 +335,7 @@ $res_tabla = $conexion->query($query_tabla);
                 maintainAspectRatio: false,
                 layout: {
                     padding: {
-                        bottom: 25 // Margen inferior para que las etiquetas no se corten
+                        bottom: 25
                     }
                 },
                 plugins: {

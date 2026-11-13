@@ -7,6 +7,7 @@ require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id       = intval($_POST['id'] ?? 0);
+    $pagina   = intval($_POST['pagina'] ?? 1); // Capturamos la sección actual
     $nombre   = trim($_POST['nombre'] ?? '');
     $cedula   = trim($_POST['cedula'] ?? '');
     $telefono = trim($_POST['telefono'] ?? '');
@@ -14,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tipo     = trim($_POST['tipo'] ?? '');
 
     if (empty($id) || empty($nombre) || empty($cedula) || empty($telefono) || empty($correo) || empty($tipo)) {
-        header("Location: ../vista/editar_usuario.php?id={$id}&error=campos_vacios");
+        header("Location: ../vista/editar_usuario.php?id={$id}&pagina={$pagina}&error=campos_vacios");
         exit();
     }
 
@@ -25,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_cedula->get_result()->num_rows > 0) {
         $check_cedula->close();
         $conexion->close();
-        header("Location: ../vista/editar_usuario.php?id={$id}&error=duplicado&campo=cedula");
+        header("Location: ../vista/editar_usuario.php?id={$id}&pagina={$pagina}&error=duplicado&campo=cedula");
         exit();
     }
     $check_cedula->close();
@@ -37,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_telefono->get_result()->num_rows > 0) {
         $check_telefono->close();
         $conexion->close();
-        header("Location: ../vista/editar_usuario.php?id={$id}&error=duplicado&campo=telefono");
+        header("Location: ../vista/editar_usuario.php?id={$id}&pagina={$pagina}&error=duplicado&campo=telefono");
         exit();
     }
     $check_telefono->close();
@@ -49,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_correo->get_result()->num_rows > 0) {
         $check_correo->close();
         $conexion->close();
-        header("Location: ../vista/editar_usuario.php?id={$id}&error=duplicado&campo=correo");
+        header("Location: ../vista/editar_usuario.php?id={$id}&pagina={$pagina}&error=duplicado&campo=correo");
         exit();
     }
     $check_correo->close();
@@ -67,12 +68,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $stmt_up->close();
         $conexion->close();
-        header("Location: ../vista/administrar_usuarios.php?edit_exito=1");
+        // Redirige de regreso a la sección exacta
+        header("Location: ../vista/administrar_usuarios.php?pagina={$pagina}&edit_exito=1");
         exit();
     } else {
         $stmt_up->close();
         $conexion->close();
-        header("Location: ../vista/editar_usuario.php?id={$id}&error=1");
+        header("Location: ../vista/editar_usuario.php?id={$id}&pagina={$pagina}&error=1");
         exit();
     }
 } else {

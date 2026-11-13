@@ -7,6 +7,7 @@ require_once 'registrar_bitacora.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id                  = intval($_POST['id'] ?? 0);
+    $pagina              = intval($_POST['pagina'] ?? 1); // Capturar sección actual
     $cedula              = trim($_POST['cedula'] ?? '');
     $nombre              = trim($_POST['nombre'] ?? '');
     $apellido            = trim($_POST['apellido'] ?? '');
@@ -15,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $instituto_educativo = trim($_POST['instituto_educativo'] ?? '');
 
     if (empty($id) || empty($cedula) || empty($nombre) || empty($apellido) || empty($telefono) || empty($correo) || empty($instituto_educativo)) {
-        header("Location: ../vista/editar_profesor.php?id={$id}&error=campos_vacios");
+        header("Location: ../vista/editar_profesor.php?id={$id}&pagina={$pagina}&error=campos_vacios");
         exit();
     }
 
@@ -26,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_cedula->get_result()->num_rows > 0) {
         $check_cedula->close();
         $conexion->close();
-        header("Location: ../vista/editar_profesor.php?id={$id}&error=duplicado&campo=cedula");
+        header("Location: ../vista/editar_profesor.php?id={$id}&pagina={$pagina}&error=duplicado&campo=cedula");
         exit();
     }
     $check_cedula->close();
@@ -38,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_telefono->get_result()->num_rows > 0) {
         $check_telefono->close();
         $conexion->close();
-        header("Location: ../vista/editar_profesor.php?id={$id}&error=duplicado&campo=telefono");
+        header("Location: ../vista/editar_profesor.php?id={$id}&pagina={$pagina}&error=duplicado&campo=telefono");
         exit();
     }
     $check_telefono->close();
@@ -50,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_correo->get_result()->num_rows > 0) {
         $check_correo->close();
         $conexion->close();
-        header("Location: ../vista/editar_profesor.php?id={$id}&error=duplicado&campo=correo");
+        header("Location: ../vista/editar_profesor.php?id={$id}&pagina={$pagina}&error=duplicado&campo=correo");
         exit();
     }
     $check_correo->close();
@@ -68,12 +69,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $stmt->close();
         $conexion->close();
-        header("Location: ../vista/ver_profesores.php?edit_exito=1");
+        // Redirige conservando la misma sección exacta
+        header("Location: ../vista/ver_profesores.php?pagina={$pagina}&edit_exito=1");
         exit();
     } else {
         $stmt->close();
         $conexion->close();
-        header("Location: ../vista/editar_profesor.php?id={$id}&error=1");
+        header("Location: ../vista/editar_profesor.php?id={$id}&pagina={$pagina}&error=1");
         exit();
     }
 } else {

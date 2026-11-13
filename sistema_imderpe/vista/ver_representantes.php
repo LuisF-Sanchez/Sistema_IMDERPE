@@ -13,7 +13,7 @@ require_once '../controlador/controlador_ver_representantes.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Representantes - IMDERPE</title>
     <link rel="stylesheet" href="../estilo/style16.css">
-    <link rel="stylesheet" href="../estilo/style5.css"> <!-- Para heredar los estilos de paginación glassmorphism -->
+    <link rel="stylesheet" href="../estilo/style5.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -23,17 +23,14 @@ require_once '../controlador/controlador_ver_representantes.php';
                 <i class="fas fa-arrow-left"></i> Volver al Inicio
             </a>
 
-            <!-- APARTADO DE NÚMEROS / PAGINACIÓN EN EL ENCABEZADO -->
             <?php if (isset($total_paginas) && $total_paginas > 1): ?>
                 <div class="paginacion-header">
-                    <!-- Flecha Anterior -->
                     <?php if ($pagina > 1): ?>
                         <a href="ver_representantes.php?pagina=<?php echo $pagina - 1; ?>" class="num-box nav-arrow" title="Página Anterior">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                     <?php endif; ?>
 
-                    <!-- Rango dinámico de hasta 5 números visibles -->
                     <?php 
                         $max_visibles = 5;
                         $inicio_num = max(1, $pagina - floor($max_visibles / 2));
@@ -50,7 +47,6 @@ require_once '../controlador/controlador_ver_representantes.php';
                         </a>
                     <?php endfor; ?>
 
-                    <!-- Flecha Siguiente -->
                     <?php if ($pagina < $total_paginas): ?>
                         <a href="ver_representantes.php?pagina=<?php echo $pagina + 1; ?>" class="num-box nav-arrow" title="Página Siguiente">
                             <i class="fas fa-chevron-right"></i>
@@ -59,7 +55,6 @@ require_once '../controlador/controlador_ver_representantes.php';
                 </div>
             <?php endif; ?>
 
-            <!-- Espaciador o botón adicional si hace falta -->
             <div></div>
         </div>
     </header>
@@ -91,7 +86,7 @@ require_once '../controlador/controlador_ver_representantes.php';
                                 <td><?php echo htmlspecialchars($row['correo']); ?></td>
                                 <td><?php echo htmlspecialchars($row['direccion']); ?></td>
                                 <td class="action-cell">
-                                    <a href="editar_representante.php?id=<?php echo $row['id']; ?>" class="btn-table edit">
+                                    <a href="editar_representante.php?id=<?php echo $row['id']; ?>&pagina=<?php echo $pagina; ?>" class="btn-table edit">
                                         <i class="fas fa-edit"></i> Editar
                                     </a>
                                 </td>

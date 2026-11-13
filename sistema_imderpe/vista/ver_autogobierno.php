@@ -24,10 +24,10 @@ require_once '../controlador/controlador_autogobierno.php';
 
             <!-- APARTADO DE NÚMEROS / PAGINACIÓN EN EL ENCABEZADO -->
             <?php if (isset($total_paginas) && $total_paginas > 1): ?>
-                <div class="paginacion-header">
+                <div class="paginacion-header" style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
                     <!-- Flecha Anterior -->
                     <?php if ($pagina > 1): ?>
-                        <a href="autogobierno.php?pagina=<?php echo $pagina - 1; ?>" class="num-box nav-arrow" title="Página Anterior">
+                        <a href="ver_autogobierno.php?pagina=<?php echo $pagina - 1; ?>" class="num-box nav-arrow" title="Sección Anterior">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                     <?php endif; ?>
@@ -44,16 +44,24 @@ require_once '../controlador/controlador_autogobierno.php';
 
                         for ($i = $inicio_num; $i <= $fin_num; $i++): 
                     ?>
-                        <a href="autogobierno.php?pagina=<?php echo $i; ?>" class="num-box <?php echo ($i == $pagina) ? 'active' : ''; ?>">
+                        <a href="ver_autogobierno.php?pagina=<?php echo $i; ?>" class="num-box <?php echo ($i == $pagina) ? 'active' : ''; ?>">
                             <?php echo $i; ?>
                         </a>
                     <?php endfor; ?>
 
                     <!-- Flecha Siguiente -->
                     <?php if ($pagina < $total_paginas): ?>
-                        <a href="autogobierno.php?pagina=<?php echo $pagina + 1; ?>" class="num-box nav-arrow" title="Página Siguiente">
+                        <a href="ver_autogobierno.php?pagina=<?php echo $pagina + 1; ?>" class="num-box nav-arrow" title="Sección Siguiente">
                             <i class="fas fa-chevron-right"></i>
                         </a>
+                    <?php endif; ?>
+
+                    <!-- Buscador si hay más de 5 secciones -->
+                    <?php if ($total_paginas > 5): ?>
+                        <form action="ver_autogobierno.php" method="GET" style="display: inline-flex; align-items: center; margin-left: 8px;">
+                            <input type="number" name="pagina" min="1" max="<?php echo $total_paginas; ?>" placeholder="Sección..." required style="width: 70px; padding: 4px; border-radius: 4px; border: 1px solid #ccc; text-align: center; font-size: 14px;">
+                            <button type="submit" class="num-box" style="padding: 4px 8px; margin-left: 4px; cursor: pointer; border: none; background: #1D3D81; color: white; border-radius: 4px;"><i class="fas fa-search"></i></button>
+                        </form>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -98,7 +106,8 @@ require_once '../controlador/controlador_autogobierno.php';
                                 </td>
                                 <td class="action-cell">
                                     <div class="action-buttons-wrapper">
-                                        <a href="editar_autogobierno.php?id=<?php echo $row['id']; ?>" class="btn-table edit">
+                                        <!-- Se pasa la variable de la sección/página actual -->
+                                        <a href="editar_autogobierno.php?id=<?php echo $row['id']; ?>&pagina=<?php echo $pagina; ?>" class="btn-table edit">
                                             <i class="fas fa-edit"></i> Editar
                                         </a>
                                     </div>
@@ -117,89 +126,23 @@ require_once '../controlador/controlador_autogobierno.php';
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         function limpiarURL() {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         <?php if (isset($_GET['registro']) && $_GET['registro'] == 'exito'): ?>
-            Swal.fire({
-                title: '¡Registro Exitoso!',
-                text: 'El responsable de autogobierno ha sido guardado correctamente.',
-                icon: 'success',
-                timer: 3000,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                background: '#1D3D81',
-                color: '#ffffff',
-                iconColor: '#28a745'
-            });
+            Swal.fire({ title: '¡Registro Exitoso!', text: 'El responsable de autogobierno ha sido guardado correctamente.', icon: 'success', timer: 3000, toast: true, position: 'top-end', showConfirmButton: false, background: '#1D3D81', color: '#ffffff', iconColor: '#28a745' });
             limpiarURL();
         <?php endif; ?>
 
         <?php if (isset($_GET['edit_exito'])): ?>
-            Swal.fire({
-                title: '¡Cambios Guardados!',
-                text: 'La información del responsable de autogobierno ha sido actualizada.',
-                icon: 'success',
-                timer: 3000,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                background: '#1D3D81',
-                color: '#ffffff',
-                iconColor: '#4db8ff'
-            });
+            Swal.fire({ title: '¡Cambios Guardados!', text: 'La información del responsable ha sido actualizada.', icon: 'success', timer: 3000, toast: true, position: 'top-end', showConfirmButton: false, background: '#1D3D81', color: '#ffffff', iconColor: '#4db8ff' });
             limpiarURL();
         <?php endif; ?>
 
         <?php if (isset($_GET['error_duplicado'])): ?>
-            Swal.fire({
-                title: '¡Cédula Duplicada!',
-                text: 'La cédula ingresada ya pertenece a un responsable registrado.',
-                icon: 'warning',
-                timer: 3500,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                background: '#1D3D81',
-                color: '#ffffff',
-                iconColor: '#FBC02D'
-            });
-            limpiarURL();
-        <?php endif; ?>
-
-        <?php if (isset($_GET['error_campos'])): ?>
-            Swal.fire({
-                title: 'Campos Incompletos',
-                text: 'Por favor, rellene todos los campos obligatorios.',
-                icon: 'error',
-                timer: 3500,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                background: '#1D3D81',
-                color: '#ffffff',
-                iconColor: '#ff4d4d'
-            });
-            limpiarURL();
-        <?php endif; ?>
-
-        <?php if (isset($_GET['error_db'])): ?>
-            Swal.fire({
-                title: 'Error del Sistema',
-                text: 'No se pudo procesar la solicitud. Intente nuevamente.',
-                icon: 'error',
-                timer: 3500,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                background: '#1D3D81',
-                color: '#ffffff',
-                iconColor: '#ff4d4d'
-            });
+            Swal.fire({ title: '¡Cédula Duplicada!', text: 'La cédula ingresada ya pertenece a un responsable.', icon: 'warning', timer: 3500, toast: true, position: 'top-end', showConfirmButton: false, background: '#1D3D81', color: '#ffffff', iconColor: '#FBC02D' });
             limpiarURL();
         <?php endif; ?>
     </script>

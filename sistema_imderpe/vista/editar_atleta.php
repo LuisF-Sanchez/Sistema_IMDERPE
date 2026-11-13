@@ -1,15 +1,25 @@
 <?php
 session_start();
 
+$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+$disciplina_filtro = isset($_GET['disciplina']) ? $_GET['disciplina'] : '';
+$genero_filtro = isset($_GET['genero']) ? $_GET['genero'] : '';
+$categoria_filtro = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+
+$filtros_query = "";
+if (!empty($disciplina_filtro)) $filtros_query .= "&disciplina=" . urlencode($disciplina_filtro);
+if (!empty($genero_filtro)) $filtros_query .= "&genero=" . urlencode($genero_filtro);
+if (!empty($categoria_filtro)) $filtros_query .= "&categoria=" . urlencode($categoria_filtro);
+
 require_once '../controlador/controlador_editar_atleta.php';
 
 if (!isset($atleta)) {
-    header("Location: ver_atletas.php");
+    header("Location: ver_atletas.php?pagina=" . $pagina_actual . $filtros_query);
     exit();
 }
 
-$error_duplicado =$_GET['error'] ?? '';
-$campo_duplicado =$_GET['campo'] ?? '';
+$error_duplicado = $_GET['error'] ?? '';
+$campo_duplicado = $_GET['campo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -22,7 +32,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
 </head>
 <body>
     <div class="login-container">
-        <form action="../controlador/controlador_editar_atleta.php" method="POST" class="glass-form" novalidate>
+        <form action="../controlador/controlador_editar_atleta.php?pagina=<?php echo $pagina_actual; ?><?php echo $filtros_query; ?>" method="POST" class="glass-form" novalidate>
             <div class="logo-container">
                 <img src="../estilo/logo.png" alt="Logo IMDERPE" class="logo-form">
             </div>
@@ -34,7 +44,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
                 <div class="input-group">
                     <i class="fas fa-id-card"></i>
                     <input type="text" name="cedula" id="cedula" value="<?php echo htmlspecialchars($atleta['cedula']); ?>" placeholder="Cédula de Identidad">
-                    <?php if ($error_duplicado === 'duplicado' &&$campo_duplicado === 'cedula'): ?>
+                    <?php if ($error_duplicado === 'duplicado' && $campo_duplicado === 'cedula'): ?>
                         <span class="error-mensaje error-backend">* esta cedula ya existe</span>
                     <?php endif; ?>
                 </div>
@@ -53,8 +63,8 @@ $campo_duplicado =$_GET['campo'] ?? '';
                     <i class="fas fa-venus-mars"></i>
                     <select name="genero" id="genero">
                         <option value="" disabled>Seleccione Género</option>
-<option value="Masculino" <?php echo ($atleta['genero'] == 'Masculino' || $atleta['genero'] == 'M') ? 'selected' : ''; ?>>Masculino</option>
-<option value="Femenino" <?php echo ($atleta['genero'] == 'Femenino' || $atleta['genero'] == 'F') ? 'selected' : ''; ?>>Femenino</option>
+                        <option value="Masculino" <?php echo ($atleta['genero'] == 'Masculino' || $atleta['genero'] == 'M') ? 'selected' : ''; ?>>Masculino</option>
+                        <option value="Femenino" <?php echo ($atleta['genero'] == 'Femenino' || $atleta['genero'] == 'F') ? 'selected' : ''; ?>>Femenino</option>
                     </select>
                 </div>
 
@@ -83,10 +93,10 @@ $campo_duplicado =$_GET['campo'] ?? '';
                         <option value="" disabled>Seleccione Representante Legal</option>
                         <?php 
                         $res_representantes->data_seek(0);
-                        while($rep =$res_representantes->fetch_assoc()): 
+                        while($rep = $res_representantes->fetch_assoc()): 
                         ?>
                             <option value="<?php echo $rep['id']; ?>" 
-                                <?php echo ($atleta['representante_id'] ==$rep['id']) ? 'selected' : ''; ?>>
+                                <?php echo ($atleta['representante_id'] == $rep['id']) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($rep['nombre'] . " " . $rep['apellido']); ?>
                             </option>
                         <?php endwhile; ?>
@@ -99,10 +109,10 @@ $campo_duplicado =$_GET['campo'] ?? '';
                         <option value="" disabled>Seleccione Entrenador Asignado</option>
                         <?php 
                         $res_entrenadores->data_seek(0);
-                        while($ent =$res_entrenadores->fetch_assoc()): 
+                        while($ent = $res_entrenadores->fetch_assoc()): 
                         ?>
                             <option value="<?php echo $ent['id']; ?>" 
-                                <?php echo ($atleta['entrenador_id'] ==$ent['id']) ? 'selected' : ''; ?>>
+                                <?php echo ($atleta['entrenador_id'] == $ent['id']) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($ent['nombre'] . " " . $ent['apellido']); ?>
                             </option>
                         <?php endwhile; ?>
@@ -115,10 +125,10 @@ $campo_duplicado =$_GET['campo'] ?? '';
                         <option value="" disabled>Seleccione Disciplina Deportiva</option>
                         <?php 
                         $res_disciplinas->data_seek(0);
-                        while($disc =$res_disciplinas->fetch_assoc()): 
+                        while($disc = $res_disciplinas->fetch_assoc()): 
                         ?>
                             <option value="<?php echo $disc['id']; ?>" 
-                                <?php echo ($atleta['disciplina_id'] ==$disc['id']) ? 'selected' : ''; ?>>
+                                <?php echo ($atleta['disciplina_id'] == $disc['id']) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($disc['nombre_disciplina']); ?>
                             </option>
                         <?php endwhile; ?>
@@ -137,7 +147,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
 
             <div class="action-row">
                 <button type="submit" name="btn_actualizar" value="ok" class="btn-update">ACTUALIZAR INFORMACIÓN</button>
-                <a href="ver_atletas.php" class="btn-cancel">Cancelar y Volver</a>
+                <a href="ver_atletas.php?pagina=<?php echo $pagina_actual . $filtros_query; ?>" class="btn-cancel">Cancelar y Volver</a>
             </div>
         </form>
     </div>
@@ -147,7 +157,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
         const form = document.querySelector('.glass-form');
 
         if (window.location.search.includes('error=duplicado')) {
-            window.history.replaceState({}, document.title, window.location.pathname + '?id=<?php echo $atleta['id']; ?>');
+            window.history.replaceState({}, document.title, window.location.pathname + '?id=<?php echo $atleta['id']; ?>&pagina=<?php echo $pagina_actual; ?><?php echo $filtros_query; ?>');
         }
 
         const errorBackend = document.querySelector('.error-backend');
@@ -176,7 +186,7 @@ $campo_duplicado =$_GET['campo'] ?? '';
 
             form.querySelectorAll('.error-mensaje:not(.error-backend)').forEach(el => el.remove());
 
-            const campos = form.querySelectorAll('.form-grid input, .form-grid select');
+            const campos = form.querySelectorAll('.form-grid input:not([type="hidden"]), .form-grid select');
 
             campos.forEach(campo => {
                 const parentGroup = campo.closest('.input-group');

@@ -60,7 +60,6 @@ $stmt_insert->bind_param("ssssss", $cedula, $nombre, $apellido, $telefono, $corr
 if ($stmt_insert->execute()) {
     $nuevo_id = $stmt_insert->insert_id;
 
-    // Registrar en la bitácora con formato estándar y limpio
     $rol = ucfirst($_SESSION['usuario_tipo'] ?? 'Administrador');
     $nombre_user = $_SESSION['usuario_nombre'] ?? 'Desconocido';
     
